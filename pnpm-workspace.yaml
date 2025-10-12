@@ -1,0 +1,10 @@
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@tailwindcss/oxide'
+  - bufferutil
+  - keccak
+  - prisma
+  - sharp
+  - unrs-resolver
+  - utf-8-validate

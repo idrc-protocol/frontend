@@ -1,0 +1,133 @@
+{
+  "Auth": {
+    "Login": {
+      "title": "Daftar atau Masuk",
+      "subtitle": "Masukkan email Anda untuk masuk ke akun Anda. Jika Anda belum punya akun, akun akan dibuatkan untuk Anda.",
+      "emailOrUsernameLabel": "Email atau Username",
+      "passwordLabel": "Kata Sandi",
+      "signInButton": "Masuk",
+      "signingInButton": "Sedang Masuk...",
+      "orDivider": "atau",
+      "noAccountText": "Belum punya akun?",
+      "registerLink": "Daftar di sini",
+      "privacyText": "Dengan melanjutkan, Anda menyetujui",
+      "privacyPolicyLink": "Kebijakan Privasi",
+      "termsText": "dan",
+      "termsOfServiceLink": "Syarat Layanan",
+      "needHelpText": "Butuh bantuan? Hubungi kami melalui",
+      "supportEmail": "support@idrc.site",
+      "forgotPasswordLink": "Lupa kata sandi?"
+    },
+    "Register": {
+      "title": "Buat akun Anda",
+      "subtitle": "Masukkan detail Anda untuk membuat akun baru",
+      "firstNameLabel": "Nama Depan",
+      "lastNameLabel": "Nama Belakang",
+      "usernameLabel": "Username",
+      "emailLabel": "Email",
+      "passwordLabel": "Kata Sandi",
+      "confirmPasswordLabel": "Konfirmasi Kata Sandi",
+      "userTypeLabel": "Jenis Pengguna",
+      "businessTypeLabel": "Jenis Bisnis",
+      "userTypes": {
+        "consumer": "Konsumen",
+        "business": "Bisnis"
+      },
+      "businessTypes": {
+        "retail": "Retail",
+        "merchant": "Merchant"
+      },
+      "createAccountButton": "Buat Akun",
+      "creatingAccountButton": "Membuat Akun...",
+      "orDivider": "atau",
+      "hasAccountText": "Sudah punya akun?",
+      "signInLink": "Masuk saja",
+      "privacyText": "Dengan melanjutkan, Anda menyetujui",
+      "privacyPolicyLink": "Kebijakan Privasi",
+      "termsText": "dan",
+      "termsOfServiceLink": "Syarat Layanan",
+      "needHelpText": "Butuh bantuan? Hubungi kami melalui",
+      "supportEmail": "support@idrc.site"
+    },
+    "Activation": {
+      "checkEmailTitle": "Periksa Email Anda",
+      "sentActivationText": "Kami telah mengirim tautan aktivasi ke:",
+      "resendButton": "Kirim Ulang Email Aktivasi",
+      "sendingButton": "Mengirim...",
+      "resendInButton": "Kirim ulang dalam {time}",
+      "successMessage": "✓ Email aktivasi berhasil dikirim! Silakan periksa kotak masuk Anda.",
+      "errorMessage": "Terjadi kesalahan saat mengirim email. Silakan coba lagi atau hubungi dukungan.",
+      "differentEmailText": "Perlu menggunakan email yang berbeda?",
+      "registerAgainLink": "Daftar lagi",
+      "alreadyActivatedText": "Sudah diaktivasi?",
+      "signInLink": "Masuk",
+      "needHelpText": "Butuh bantuan? Hubungi kami melalui",
+      "supportEmail": "support@idrc.site",
+      "activatedTitle": "Akun Diaktivasi!",
+      "activatedSubtitle": "Akun Anda sekarang siap digunakan.",
+      "continueButton": "Lanjutkan untuk Masuk"
+    },
+    "ForgotPassword": {
+      "title": "Reset Kata Sandi",
+      "description": "Masukkan alamat email Anda dan kami akan mengirimkan instruksi untuk mereset kata sandi.",
+      "emailLabel": "Alamat Email",
+      "sendButton": "Kirim Instruksi Reset",
+      "sendingButton": "Mengirim...",
+      "cancelButton": "Batal",
+      "successMessage": "Instruksi reset kata sandi telah dikirim ke alamat email Anda. Silakan periksa kotak masuk Anda.",
+      "errorMessage": "Terjadi kesalahan saat mengirim instruksi reset. Silakan coba lagi.",
+      "Validation": {
+        "emailRequired": "Alamat email wajib diisi",
+        "invalidEmail": "Silakan masukkan alamat email yang valid"
+      }
+    },
+    "ResetPassword": {
+      "title": "Reset Kata Sandi Anda",
+      "subtitle": "Masukkan kata sandi baru Anda di bawah ini",
+      "newPasswordLabel": "Kata Sandi Baru",
+      "confirmPasswordLabel": "Konfirmasi Kata Sandi Baru",
+      "resetButton": "Reset Kata Sandi",
+      "resettingButton": "Mereset...",
+      "rememberPassword": "Ingat kata sandi Anda?",
+      "signInLink": "Masuk"
+    },
+    "Common": {
+      "authBackgroundAlt": "Latar Belakang Auth"
+    },
+    "ButtonSignin": {
+      "continueWithGoogle": "Lanjutkan dengan Google",
+      "signingIn": "Sedang masuk...",
+      "loading": "Memuat...",
+      "signOut": "Keluar",
+      "googleLogoAlt": "Logo Google",
+      "signInError": "Gagal masuk dengan Google"
+    },
+    "LocaleSwitcher": {
+      "label": "Bahasa",
+      "placeholder": "Pilih bahasa",
+      "cookieWarning": "💡 Aktifkan cookie",
+      "cookieTooltip": "Aktifkan cookie fungsional untuk menyimpan preferensi bahasa"
+    },
+    "Validation": {
+      "Login": {
+        "emailOrUsernameRequired": "Email atau Username wajib diisi",
+        "emailOrUsernameMaxLength": "Email atau Username tidak boleh melebihi 100 karakter",
+        "passwordRequired": "Kata sandi wajib diisi",
+        "passwordMaxLength": "Kata sandi tidak boleh melebihi 100 karakter"
+      },
+      "Response": {
+        "accessTokenRequired": "Token akses diperlukan",
+        "expirationInteger": "Waktu kedaluwarsa harus berupa bilangan bulat",
+        "expirationPositive": "Waktu kedaluwarsa harus lebih besar dari nol",
+        "invalidUserId": "Format ID pengguna tidak valid",
+        "invalidEmail": "Alamat email tidak valid",
+        "usernameMaxLength": "Username tidak boleh melebihi 20 karakter",
+        "invalidUserType": "Silakan pilih jenis pengguna yang valid",
+        "invalidBusinessType": "Silakan pilih jenis bisnis yang valid",
+        "invalidStatus": "Nilai status tidak valid",
+        "invalidCreationDate": "Format tanggal pembuatan tidak valid",
+        "invalidUpdateDate": "Format tanggal pembaruan tidak valid"
+      }
+    }
+  }
+}

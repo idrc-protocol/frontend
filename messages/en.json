@@ -1,0 +1,133 @@
+{
+  "Auth": {
+    "Login": {
+      "title": "Sign up or Sign in",
+      "subtitle": "Enter your email to sign in to your account. If you don't have an account yet, one will be created for you.",
+      "emailOrUsernameLabel": "Email or Username",
+      "passwordLabel": "Password",
+      "signInButton": "Sign In",
+      "signingInButton": "Signing In...",
+      "orDivider": "or",
+      "noAccountText": "Don't have an account?",
+      "registerLink": "Register here",
+      "privacyText": "By continuing you agree to IDRC's",
+      "privacyPolicyLink": "Privacy Policy",
+      "termsText": "and",
+      "termsOfServiceLink": "Terms of Service",
+      "needHelpText": "Need help? Get assistance via",
+      "supportEmail": "support@idrc.site",
+      "forgotPasswordLink": "Forgot password?"
+    },
+    "Register": {
+      "title": "Create your account",
+      "subtitle": "Enter your details to create a new account",
+      "firstNameLabel": "First Name",
+      "lastNameLabel": "Last Name",
+      "usernameLabel": "Username",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "confirmPasswordLabel": "Confirm Password",
+      "userTypeLabel": "User Type",
+      "businessTypeLabel": "Business Type",
+      "userTypes": {
+        "consumer": "Consumer",
+        "business": "Business"
+      },
+      "businessTypes": {
+        "retail": "Retail",
+        "merchant": "Merchant"
+      },
+      "createAccountButton": "Create Account",
+      "creatingAccountButton": "Creating Account...",
+      "orDivider": "or",
+      "hasAccountText": "Already have an account?",
+      "signInLink": "Sign in instead",
+      "privacyText": "By continuing you agree to IDRC's",
+      "privacyPolicyLink": "Privacy Policy",
+      "termsText": "and",
+      "termsOfServiceLink": "Terms of Service",
+      "needHelpText": "Need help? Get assistance via",
+      "supportEmail": "support@idrc.site"
+    },
+    "Activation": {
+      "checkEmailTitle": "Check Your Email",
+      "sentActivationText": "We've sent an activation link to:",
+      "resendButton": "Resend Activation Email",
+      "sendingButton": "Sending...",
+      "resendInButton": "Resend in {time}",
+      "successMessage": "✓ Activation email sent successfully! Please check your inbox.",
+      "errorMessage": "There was an error sending the email. Please try again or contact support.",
+      "differentEmailText": "Need to use a different email?",
+      "registerAgainLink": "Register again",
+      "alreadyActivatedText": "Already activated?",
+      "signInLink": "Sign in",
+      "needHelpText": "Need help? Get assistance via",
+      "supportEmail": "support@idrc.site",
+      "activatedTitle": "Account Activated!",
+      "activatedSubtitle": "Your account is now ready to use.",
+      "continueButton": "Continue to Sign In"
+    },
+    "ForgotPassword": {
+      "title": "Reset Password",
+      "description": "Enter your email address and we'll send you instructions to reset your password.",
+      "emailLabel": "Email Address",
+      "sendButton": "Send Reset Instructions",
+      "sendingButton": "Sending...",
+      "cancelButton": "Cancel",
+      "successMessage": "Password reset instructions have been sent to your email address. Please check your inbox.",
+      "errorMessage": "There was an error sending the reset instructions. Please try again.",
+      "Validation": {
+        "emailRequired": "Email address is required",
+        "invalidEmail": "Please enter a valid email address"
+      }
+    },
+    "ResetPassword": {
+      "title": "Reset Your Password",
+      "subtitle": "Enter your new password below",
+      "newPasswordLabel": "New Password",
+      "confirmPasswordLabel": "Confirm New Password",
+      "resetButton": "Reset Password",
+      "resettingButton": "Resetting...",
+      "rememberPassword": "Remember your password?",
+      "signInLink": "Sign in"
+    },
+    "Common": {
+      "authBackgroundAlt": "Auth Background"
+    },
+    "ButtonSignin": {
+      "continueWithGoogle": "Continue with Google",
+      "signingIn": "Signing in...",
+      "loading": "Loading...",
+      "signOut": "Sign Out",
+      "googleLogoAlt": "Google Logo",
+      "signInError": "Failed to sign in with Google"
+    },
+    "LocaleSwitcher": {
+      "label": "Language",
+      "placeholder": "Select language",
+      "cookieWarning": "Please enable cookies",
+      "cookieTooltip": "Enable functional cookies to save language preference"
+    },
+    "Validation": {
+      "Login": {
+        "emailOrUsernameRequired": "Email or Username is required",
+        "emailOrUsernameMaxLength": "Email or Username must not exceed 100 characters",
+        "passwordRequired": "Password is required",
+        "passwordMaxLength": "Password must not exceed 100 characters"
+      },
+      "Response": {
+        "accessTokenRequired": "Access token is required",
+        "expirationInteger": "Expiration time must be an integer",
+        "expirationPositive": "Expiration time must be greater than zero",
+        "invalidUserId": "Invalid user ID format",
+        "invalidEmail": "Invalid email address",
+        "usernameMaxLength": "Username must not exceed 20 characters",
+        "invalidUserType": "Please select a valid user type",
+        "invalidBusinessType": "Please select a valid business type",
+        "invalidStatus": "Invalid status value",
+        "invalidCreationDate": "Invalid creation date format",
+        "invalidUpdateDate": "Invalid update date format"
+      }
+    }
+  }
+}
