@@ -11,24 +11,50 @@ import { FALLBACK_IMAGE } from "@/lib/constants";
 import { useBalanceCustom } from "@/hooks/query/contract/use-balance-custom";
 import { usePriceFeed } from "@/hooks/query/api/use-price-feed";
 import { formatNumber } from "@/lib/helper/number";
+import { assetsInfo } from "@/data/asset-info";
 
 export default function Overview() {
-  const { balance } = useBalanceCustom({
+  const { balanceNormalized: idrxBalance } = useBalanceCustom({
     tokenIDRX: true,
   });
 
-  const idrBalance = Number(balance) || 0;
-  const formattedIdrBalance = formatNumber(idrBalance, {
+  const { balanceNormalized: idrcBalance } = useBalanceCustom({
+    tokenIDRC: true,
+  });
+
+  const idrxBalanceNumber = Number(idrxBalance) || 0;
+  const formattedIdrxBalance = formatNumber(idrxBalanceNumber, {
     decimals: 2,
     thousandSeparator: ",",
   });
 
+  const idrcBalanceNumber = Number(idrcBalance) || 0;
+  const totalAssetValueUsd = assetsInfo.reduce((total, asset) => {
+    const assetPrice = parseFloat(asset.primaryMarket.price);
+
+    return total + idrcBalanceNumber * assetPrice;
+  }, 0);
+
   const { data: priceFeed, convertedToUsd } = usePriceFeed({
-    amountFromIdr: idrBalance,
+    amountFromIdr: idrxBalanceNumber,
   });
 
-  const usdBalance = Number(convertedToUsd) || 0;
-  const formattedUsdBalance = formatNumber(usdBalance, {
+  const idrxUsdValue = Number(convertedToUsd) || 0;
+  const formattedIdrxUsdBalance = formatNumber(idrxUsdValue, {
+    decimals: 2,
+    thousandSeparator: ",",
+  });
+
+  const assetValueInIdrx = totalAssetValueUsd * (priceFeed?.usdToIdr || 0);
+  const totalPortfolioIdrx = idrxBalanceNumber + assetValueInIdrx;
+
+  const formattedTotalPortfolioIdrx = formatNumber(totalPortfolioIdrx, {
+    decimals: 2,
+    thousandSeparator: ",",
+  });
+
+  const totalPortfolioUsd = idrxUsdValue + totalAssetValueUsd;
+  const formattedTotalPortfolioUsd = formatNumber(totalPortfolioUsd, {
     decimals: 2,
     thousandSeparator: ",",
   });
@@ -67,15 +93,15 @@ export default function Overview() {
       <div>
         <div className="flex items-center gap-1">
           <span className="text-sm font-normal">Total Portfolio Balance</span>
-          <ButtonTooltip text="The total USD value of all your assets in your IDRC portfolio. Your IDRC portfolio is limited to Global Markets Assets, Yield Assets, and USDC." />
+          <ButtonTooltip text="The total value of all your assets in IDRX. This includes your IDRX stablecoin balance and the value of your tokenized assets (IDRC)." />
         </div>
         <div className="flex flex-col gap-1">
           <div className="flex items-end gap-2">
             <span className="text-4xl text-black font-medium">
-              Rp {formattedIdrBalance}
+              {formattedTotalPortfolioIdrx} IDRX
             </span>
             <span className="text-lg text-gray-600 pb-1">
-              ≈ ${formattedUsdBalance}
+              ≈ ${formattedTotalPortfolioUsd}
             </span>
           </div>
           <div className="flex items-center gap-1">
@@ -104,10 +130,10 @@ export default function Overview() {
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="text-2xl text-black font-medium">
-                Rp {formattedIdrBalance}
+                {formattedIdrxBalance} IDRX
               </span>
               <span className="text-sm text-gray-600">
-                ≈ ${formattedUsdBalance}
+                ≈ ${formattedIdrxUsdBalance}
               </span>
             </div>
           </div>
@@ -167,12 +193,115 @@ export default function Overview() {
                 </td>
 
                 <td className="py-2 text-sm font-medium text-end">
-                  {formatNumber(Number(balance), {
+                  {formatNumber(idrxBalanceNumber, {
                     decimals: 2,
                     thousandSeparator: ",",
                   })}
                 </td>
               </tr>
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
+
+      {/* Asset Portfolio Section */}
+      <Card className="p-5">
+        <CardContent className="flex flex-col gap-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              <span className="text-sm font-medium text-black">
+                Asset Portfolio
+              </span>
+              <ButtonTooltip text="Your holdings of tokenized real-world assets in the IDRC Protocol." />
+            </div>
+          </div>
+
+          <table className="w-full table-fixed">
+            <colgroup>
+              <col className="w-[30%]" />
+              <col className="w-[20%]" />
+              <col className="w-[25%]" />
+              <col className="w-[25%]" />
+            </colgroup>
+
+            <thead>
+              <tr className="border-b">
+                <th className="text-left text-sm font-normal pb-2">Asset</th>
+                <th className="text-center text-sm font-normal pb-2">
+                  Network
+                </th>
+                <th className="text-right text-sm font-normal pb-2">
+                  Price ($)
+                </th>
+                <th className="text-right text-sm font-normal pb-2">Balance</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {assetsInfo.map((asset) => (
+                <tr key={asset.symbol} className="border-b last:border-b-0">
+                  <td className="py-3">
+                    <div className="flex items-center gap-2">
+                      <FallbackImage
+                        alt={asset.symbol}
+                        className="rounded-full w-8 h-8"
+                        fallback={FALLBACK_IMAGE}
+                        height={32}
+                        src={asset.iconSrc}
+                        width={32}
+                      />
+                      <div className="flex flex-col">
+                        <span className="font-medium text-sm">
+                          {asset.symbol}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {asset.tokenName}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="py-3 text-center">
+                    <FallbackImage
+                      alt="Base"
+                      className="inline w-5 h-5"
+                      fallback={FALLBACK_IMAGE}
+                      height={20}
+                      src="/images/chains/base.webp"
+                      width={20}
+                    />
+                  </td>
+
+                  <td className="py-3 text-sm font-medium text-right">
+                    {formatNumber(parseFloat(asset.primaryMarket.price), {
+                      decimals: 2,
+                      thousandSeparator: ",",
+                    })}
+                  </td>
+
+                  <td className="py-3 text-sm font-medium text-right">
+                    <div className="flex flex-col items-end">
+                      <span>
+                        {formatNumber(Number(idrcBalance) || 0, {
+                          decimals: 2,
+                          thousandSeparator: ",",
+                        })}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        ≈ $
+                        {formatNumber(
+                          (Number(idrcBalance) || 0) *
+                            parseFloat(asset.primaryMarket.price),
+                          {
+                            decimals: 2,
+                            thousandSeparator: ",",
+                          },
+                        )}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </CardContent>

@@ -125,7 +125,7 @@ export default function DialogBuy({
                       (Number(assetInfo?.primaryMarket.price) || 0),
                     { decimals: 0, thousandSeparator: "," },
                   )}{" "}
-                  IDR
+                  IDRX
                 </span>
               </DialogDescription>
             </DialogHeader>
