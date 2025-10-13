@@ -3,7 +3,7 @@ name: Deploy to Production
 on:
   push:
     branches: [main]
-  workflow_dispatch:  # Allow manual triggering
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -18,67 +18,64 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: ${{ secrets.DEPLOY_PORT || 22 }}
+          script_stop: true
           script: |
-            cd /home/kizovps/idrc/frontend
+            set -e
+            cd ${{ secrets.DEPLOY_PATH || '/home/kizovps/idrc/frontend' }}
             
-            echo "========================================"
-            echo "Starting Deployment Process"
-            echo "========================================"
+            echo "=========================================="
+            echo "Deployment Started"
+            echo "=========================================="
             
-            # Pull latest changes
             echo "[1/5] Pulling latest changes..."
-            git fetch origin
-            git pull origin main
+            git fetch origin > /dev/null 2>&1
+            git pull origin main > /dev/null 2>&1
+            echo "✓ Code updated"
             
-            # Install dependencies
             echo "[2/5] Installing dependencies..."
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            pnpm install --frozen-lockfile
+            pnpm install --frozen-lockfile > /dev/null 2>&1
+            echo "✓ Dependencies installed"
             
-            # Build application
             echo "[3/5] Building application..."
-            pnpm build
+            pnpm build > /dev/null 2>&1
+            echo "✓ Build completed"
             
-            # Restart PM2
-            echo "[4/5] Restarting PM2 application..."
-            pm2 restart idrc-frontend
-            pm2 save
+            echo "[4/5] Restarting PM2..."
+            pm2 restart idrc-frontend > /dev/null 2>&1
+            pm2 save > /dev/null 2>&1
+            echo "✓ PM2 restarted"
             
-            # Verify deployment
             echo "[5/5] Verifying deployment..."
             sleep 3
             
-            if pm2 list | grep -q "idrc-frontend.*online"; then
-              echo "✅ Deployment completed successfully"
-              pm2 info idrc-frontend
+            # Check PM2 status without showing details
+            if pm2 jlist | jq -r '.[] | select(.name=="idrc-frontend") | .pm2_env.status' | grep -q "online"; then
+              echo "✅ Deployment successful"
+              echo "Application is running"
             else
-              echo "❌ Deployment failed - application not online"
-              pm2 logs idrc-frontend --lines 50 --nostream
+              echo "❌ Deployment failed"
               exit 1
             fi
             
-            echo "========================================"
-            echo "Deployment Complete!"
-            echo "========================================"
+            echo "=========================================="
+            echo "Deployment Complete"
+            echo "=========================================="
 
   notify:
-    name: Notify Deployment Status
+    name: Notify Status
     needs: [deploy]
     runs-on: ubuntu-latest
     if: always()
     
     steps:
-      - name: Deployment Success
+      - name: Success
         if: needs.deploy.result == 'success'
-        run: |
-          echo "✅ Deployment to production successful!"
-          echo "Application: idrc-frontend"
-          echo "Server: ${{ secrets.DEPLOY_HOST }}"
+        run: echo "✅ Deployment successful"
           
-      - name: Deployment Failed
+      - name: Failed
         if: needs.deploy.result != 'success'
         run: |
-          echo "❌ Deployment to production failed!"
-          echo "Please check the logs above for details."
+          echo "❌ Deployment failed"
           exit 1
