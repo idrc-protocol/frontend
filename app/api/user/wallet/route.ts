@@ -37,37 +37,45 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid chain ID" }, { status: 400 });
     }
 
-    const existingWallet = await prisma.wallet.findUnique({
+    const existingWalletByAddress = await prisma.wallet.findFirst({
       where: {
-        address_chainId: {
-          address,
-          chainId: chain.id,
-        },
+        address: address.toLowerCase(),
       },
       include: {
         user: true,
+        chain: true,
       },
     });
 
-    if (existingWallet && existingWallet.userId !== userId) {
+    if (existingWalletByAddress && existingWalletByAddress.userId !== userId) {
       return NextResponse.json(
         { error: "This wallet address is already registered by another user" },
         { status: 409 },
       );
     }
 
-    const wallet = await prisma.wallet.upsert({
+    const userChainWallet = await prisma.wallet.findUnique({
       where: {
         userId_chainId: {
           userId,
           chainId: chain.id,
         },
       },
-      update: {
-        address,
+      include: {
+        chain: true,
       },
-      create: {
-        address,
+    });
+
+    if (userChainWallet) {
+      return NextResponse.json(
+        { error: `You already have a wallet registered for ${chain.name}` },
+        { status: 409 },
+      );
+    }
+
+    const wallet = await prisma.wallet.create({
+      data: {
+        address: address.toLowerCase(),
         userId,
         chainId: chain.id,
       },

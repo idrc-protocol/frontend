@@ -98,19 +98,17 @@ export default function EditWalletSheet({
     }
 
     if (!wallet) {
-      const isDuplicate = existingWallets.some(
+      const hasChainWallet = existingWallets.some(
         (existingWallet) =>
-          existingWallet.address.toLowerCase() ===
-            formData.address.toLowerCase() &&
           existingWallet.chain.chainId === parseInt(formData.chainId),
       );
 
-      if (isDuplicate) {
+      if (hasChainWallet) {
         const chainName =
           chains.find((c) => c.chainId === parseInt(formData.chainId))?.name ||
           "this chain";
 
-        toast.error(`This wallet address is already added for ${chainName}`);
+        toast.error(`You already have a wallet registered for ${chainName}`);
 
         return;
       }
@@ -161,14 +159,13 @@ export default function EditWalletSheet({
     const existingCount = existingWallets.filter(
       (w) => w.chain.chainId === chain.chainId,
     ).length;
-    const label =
-      existingCount > 0
-        ? `${chain.name} (${existingCount} wallet${existingCount > 1 ? "s" : ""})`
-        : chain.name;
+    const hasWallet = existingCount > 0;
+    const label = hasWallet ? `${chain.name} (Already added)` : chain.name;
 
     return {
       value: chain.chainId.toString(),
       label,
+      disabled: hasWallet && !wallet,
       icon: (
         <FallbackImage
           alt={chain.name}
@@ -220,7 +217,10 @@ export default function EditWalletSheet({
               label="Wallet Address"
               value={formData.address}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, address: e.target.value }))
+                setFormData((prev) => ({
+                  ...prev,
+                  address: e.target.value.toLowerCase(),
+                }))
               }
             />
           </div>
