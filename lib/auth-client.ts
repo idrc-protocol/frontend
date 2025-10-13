@@ -8,12 +8,12 @@ import {
 } from "better-auth/client/plugins";
 
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  baseURL: process.env.NEXT_PUBLIC_APP_URL!,
   plugins: [
     usernameClient(),
     emailOTPClient(),
     oneTapClient({
-      clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "",
+      clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
       autoSelect: false,
       cancelOnTapOutside: true,
       context: "signin",
