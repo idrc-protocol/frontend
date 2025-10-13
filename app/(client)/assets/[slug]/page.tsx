@@ -5,9 +5,8 @@ import {
   generatePageMetadata,
   pageMetadataConfigs,
 } from "@/lib/utils/metadata";
-import Loading from "@/components/loader/loading";
 
-import Asset from "./_components/asset";
+import Asset, { AssetSkeleton } from "./_components/asset";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -32,7 +31,7 @@ export default async function page({ params }: PageProps) {
   const symbol = slug;
 
   return (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<AssetSkeleton />}>
       <Asset symbol={symbol} />
     </Suspense>
   );

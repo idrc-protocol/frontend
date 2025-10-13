@@ -4,10 +4,48 @@ import React from "react";
 import Link from "next/link";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { assetData } from "@/data/asset.data";
 import { generateChartPath } from "@/components/chart/generate-chart-path";
 import FallbackImage from "@/components/fallback-image";
 import { AnimatedNumber } from "@/components/animations/animated-number";
+
+export function ExploreSkeleton() {
+  return (
+    <div className="flex flex-col gap-10 mt-5">
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-8 w-48" />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1, 2, 3].map((index) => (
+          <Card key={index} className="p-5">
+            <CardContent className="flex flex-col gap-5">
+              <div className="flex items-center gap-3">
+                <Skeleton className="rounded-full w-11 h-11" />
+                <div className="flex flex-col gap-2">
+                  <Skeleton className="h-5 w-20" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+              </div>
+
+              <div className="bg-gray-100 rounded-3xl mt-2 overflow-hidden">
+                <div className="pt-6 px-6 h-32 flex flex-col gap-2">
+                  <Skeleton className="h-8 w-32" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+
+                <div className="h-32 px-6 pb-6">
+                  <Skeleton className="w-full h-full" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function Explore() {
   return (

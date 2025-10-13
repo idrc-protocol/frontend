@@ -5,14 +5,79 @@ import { useRouter } from "next/navigation";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import ButtonTooltip from "@/components/tooltip/button-tooltip";
 import { Button } from "@/components/ui/button";
 import FallbackImage from "@/components/fallback-image";
-import Loading from "@/components/loader/loading";
 import { FALLBACK_IMAGE } from "@/lib/constants";
 import { assetData } from "@/data/asset.data";
 import { useSession } from "@/lib/auth-client";
 import { useOnboardingStatus } from "@/hooks/query/api/use-onboarding-status";
+
+function OnboardingSkeleton() {
+  return (
+    <div className="flex flex-col gap-10">
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-8 w-40" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {[1, 2].map((index) => (
+          <Card key={index} className="p-5">
+            <CardContent className="flex flex-col gap-5">
+              <div>
+                <div className="flex justify-between items-start">
+                  <div className="flex items-start gap-3">
+                    <Skeleton className="w-10 h-10 rounded" />
+                    <div className="flex flex-col gap-2">
+                      <Skeleton className="h-4 w-16" />
+                      <Skeleton className="h-3 w-32" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-10 w-24" />
+                </div>
+
+                <Separator className="my-5" orientation="horizontal" />
+
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-between text-sm">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-32" />
+                  </div>
+
+                  <div className="flex justify-between text-sm">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+
+                  <div className="flex justify-between text-sm">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-28" />
+                  </div>
+
+                  <div className="flex justify-between text-sm">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+
+                  <div className="flex justify-between text-sm">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-4 w-56" />
+                  </div>
+
+                  <div className="flex justify-between text-sm">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function Onboarding() {
   const router = useRouter();
@@ -58,7 +123,7 @@ export default function Onboarding() {
   };
 
   if (isPending || isLoading || !userStatus) {
-    return <Loading />;
+    return <OnboardingSkeleton />;
   }
 
   const getActionButton = () => {

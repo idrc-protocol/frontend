@@ -12,6 +12,7 @@ import DialogSell from "@/components/dialog/dialog-sell";
 import FallbackImage from "@/components/fallback-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
@@ -105,6 +106,121 @@ interface InfoRowProps {
   label: string;
   value?: string | null;
   fallback?: string;
+}
+
+export function AssetSkeleton() {
+  return (
+    <div className="w-full h-full pb-24 lg:pb-10 min-h-svh">
+      <div className="flex flex-col lg:flex-row items-start gap-6 mt-5 relative">
+        <div className="flex-1 flex flex-col gap-6">
+          <div className="flex items-center gap-3">
+            <Skeleton className="rounded-full w-12 h-12" />
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-8 w-32" />
+              <Skeleton className="h-4 w-48" />
+            </div>
+          </div>
+
+          <div className="w-full">
+            <Skeleton className="w-full h-[430px] rounded-lg" />
+          </div>
+
+          <Separator />
+
+          <div>
+            <Skeleton className="h-6 w-48 mb-4" />
+            <div className="space-y-3">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="flex justify-between py-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Separator />
+
+          <div>
+            <Skeleton className="h-6 w-40 mb-3" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          </div>
+
+          <Separator />
+
+          <div>
+            <Skeleton className="h-6 w-32 mb-3" />
+            <div className="flex flex-wrap gap-2">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-6 w-24 rounded-full" />
+              ))}
+            </div>
+          </div>
+
+          <Separator />
+
+          <div>
+            <Skeleton className="h-6 w-32 mb-4" />
+            <div className="space-y-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="flex justify-between py-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="hidden lg:flex w-96 sticky top-5 max-h-svh overflow-y-auto flex-shrink-0 flex-col gap-3">
+          <div className="border-[0.5px] border-border rounded-4xl p-6">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-5 w-24" />
+                <Skeleton className="h-5 w-16" />
+              </div>
+              <Skeleton className="h-12 w-full" />
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-4 w-20" />
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                  <Skeleton className="h-4 w-4 rounded-full" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-12 flex-1 rounded-3xl" />
+            <Skeleton className="h-12 flex-1 rounded-3xl" />
+          </div>
+
+          <div className="border-[0.5px] border-border rounded-4xl p-6">
+            <div className="flex flex-col gap-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              ))}
+              <Separator />
+              <Skeleton className="h-16 w-full" />
+            </div>
+          </div>
+
+          <Skeleton className="h-14 w-full rounded-3xl" />
+        </div>
+      </div>
+
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border z-50">
+        <Skeleton className="h-14 w-full rounded-3xl" />
+      </div>
+    </div>
+  );
 }
 
 function InfoRow({ label, value, fallback = "N/A" }: InfoRowProps) {

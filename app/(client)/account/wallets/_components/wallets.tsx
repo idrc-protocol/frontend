@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import ButtonCopy from "@/components/copy/button-copy";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import Loading from "@/components/loader/loading";
+import { Skeleton } from "@/components/ui/skeleton";
 import { encodeSvgDataUri } from "@/lib/utils";
 import { useSession } from "@/lib/auth-client";
 import { useWallets, useDeleteWallet } from "@/hooks/query/api/use-wallets";
@@ -51,6 +51,78 @@ function getWalletStatus(): {
   return { status: "Active", variant: "default" };
 }
 
+function WalletsSkeleton() {
+  return (
+    <div className="flex flex-col gap-10 max-w-4xl">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-8 w-56" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-3/4" />
+      </div>
+
+      <div className="flex flex-col">
+        <div className="border-b pb-2 mb-4">
+          <div className="flex items-center">
+            <div className="flex-1">
+              <Skeleton className="h-4 w-16" />
+            </div>
+            <div className="flex-1 flex justify-center">
+              <Skeleton className="h-4 w-20" />
+            </div>
+            <div className="flex-1 flex justify-center">
+              <Skeleton className="h-4 w-16" />
+            </div>
+            <div className="flex-1 flex justify-center">
+              <Skeleton className="h-4 w-16" />
+            </div>
+            <div className="flex-1 flex justify-end">
+              <Skeleton className="h-4 w-16" />
+            </div>
+          </div>
+        </div>
+
+        {[1, 2, 3].map((index) => (
+          <div
+            key={index}
+            className="border-b border-gray-100 py-3 flex items-center"
+          >
+            <div className="flex-1 flex flex-col gap-2">
+              <Skeleton className="h-4 w-32" />
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-3 w-28" />
+                <Skeleton className="h-3 w-3" />
+              </div>
+            </div>
+
+            <div className="flex-1 flex justify-center">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-5 rounded-full" />
+                <Skeleton className="h-4 w-20" />
+              </div>
+            </div>
+
+            <div className="flex-1 flex justify-center">
+              <Skeleton className="h-6 w-16 rounded-full" />
+            </div>
+
+            <div className="flex-1 flex justify-center">
+              <Skeleton className="h-4 w-24" />
+            </div>
+
+            <div className="flex-1 flex justify-end gap-2">
+              <Skeleton className="h-5 w-5" />
+              <Skeleton className="h-5 w-5" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Wallets() {
   const { data: session } = useSession();
   const userId = session?.user?.id;
@@ -83,7 +155,7 @@ export default function Wallets() {
   }
 
   if (isLoading) {
-    return <Loading />;
+    return <WalletsSkeleton />;
   }
 
   if (error) {

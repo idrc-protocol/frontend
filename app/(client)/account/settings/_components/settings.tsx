@@ -1,47 +1,138 @@
 "use client";
 
-import React, { useState, Suspense, useEffect } from "react";
-import { Check, X, Edit2, Mail, Key, User, Camera } from "lucide-react";
-import { toast } from "sonner";
+import { Camera, Check, Edit2, Key, Mail, User, X } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { toast } from "sonner";
 
-import { Separator } from "@/components/ui/separator";
+import { useAuthContext } from "@/components/providers/auth-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogPortal,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import { useAuthContext } from "@/components/providers/auth-provider";
-import { authClient } from "@/lib/auth-client";
-import Loading from "@/components/loader/loading";
+import { InputFloating } from "@/components/ui/input-floating";
 import {
-  useUserSettings,
-  useUpdateUsername,
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { Separator } from "@/components/ui/separator";
+import ImageUploadBox from "@/components/upload/image-upload-box";
+import {
   useChangePassword,
   useSendVerificationEmail,
-  useVerifyEmail,
-  useUpdateProfileImage,
   useUpdateName,
-  useInvalidateEmail,
+  useUpdateProfileImage,
+  useUpdateUsername,
+  useUserSettings,
+  useVerifyEmail,
 } from "@/hooks/query/api/use-user-settings";
-import { InputFloating } from "@/components/ui/input-floating";
-import ImageUploadBox from "@/components/upload/image-upload-box";
+import { authClient } from "@/lib/auth-client";
+
+function SettingsSkeleton() {
+  return (
+    <div className="flex flex-col gap-10 max-w-4xl">
+      <div className="flex items-center gap-4">
+        <div className="relative">
+          <Skeleton className="w-20 h-20 rounded-full" />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-5">
+        <div>
+          <div className="flex pb-5">
+            <Skeleton className="h-7 w-40" />
+          </div>
+          <Separator orientation="horizontal" />
+          <div className="flex flex-col gap-3 py-3">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+            <Separator orientation="horizontal" />
+
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-24" />
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-8 w-8 rounded" />
+              </div>
+            </div>
+            <Separator orientation="horizontal" />
+
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-36" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+            <Separator orientation="horizontal" />
+          </div>
+        </div>
+
+        <div>
+          <div className="flex pb-5">
+            <Skeleton className="h-7 w-40" />
+          </div>
+          <Separator orientation="horizontal" />
+          <div className="flex flex-col gap-3 py-3">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-16" />
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-5 w-20 rounded-full" />
+              </div>
+            </div>
+            <Separator orientation="horizontal" />
+
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-20" />
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-8 w-8 rounded" />
+              </div>
+            </div>
+            <Separator orientation="horizontal" />
+
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-20" />
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-8 w-8 rounded" />
+              </div>
+            </div>
+            <Separator orientation="horizontal" />
+
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+            <Separator orientation="horizontal" />
+
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-28" />
+            </div>
+            <Separator orientation="horizontal" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function SettingsContent() {
-  const router = useRouter();
   const { user } = useAuthContext();
   const userId = user?.id;
 
@@ -54,7 +145,6 @@ function SettingsContent() {
   const verifyEmailMutation = useVerifyEmail();
   const updateProfileImageMutation = useUpdateProfileImage();
   const updateNameMutation = useUpdateName();
-  const invalidateEmailMutation = useInvalidateEmail();
 
   const [isUsernameDialogOpen, setIsUsernameDialogOpen] = useState(false);
   const [isVerifyEmailDialogOpen, setIsVerifyEmailDialogOpen] = useState(false);
@@ -307,33 +397,8 @@ function SettingsContent() {
     }
   };
 
-  const handleInvalidateEmail = async () => {
-    try {
-      await invalidateEmailMutation.mutateAsync();
-      toast.success("Email verification status invalidated successfully!");
-
-      document.cookie.split(";").forEach((c) => {
-        const cookieName = c.split("=")[0].trim();
-
-        if (cookieName.includes("better-auth")) {
-          document.cookie =
-            cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        }
-      });
-
-      router.refresh();
-
-      setTimeout(() => {
-        window.location.href =
-          window.location.href.split("?")[0] + "?refresh=" + Date.now();
-      }, 500);
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to invalidate email verification");
-    }
-  };
-
   if (isLoadingInitial) {
-    return <Loading />;
+    return <SettingsSkeleton />;
   }
 
   if (!user) {
@@ -464,26 +529,6 @@ function SettingsContent() {
                     >
                       <span>Verify Now</span>
                       <Mail className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-                <Separator orientation="horizontal" />
-              </>
-            )}
-            {isEmailVerified && (
-              <>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Email Verification</span>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      disabled={invalidateEmailMutation.isPending}
-                      size="sm"
-                      variant="destructive"
-                      onClick={handleInvalidateEmail}
-                    >
-                      {invalidateEmailMutation.isPending
-                        ? "Invalidating..."
-                        : "Unverify Email"}
                     </Button>
                   </div>
                 </div>
@@ -976,7 +1021,7 @@ function SettingsContent() {
 
 export default function Settings() {
   return (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<SettingsSkeleton />}>
       <SettingsContent />
     </Suspense>
   );
