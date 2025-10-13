@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import request from "graphql-request";
-import { useAccount } from "wagmi";
 
 import { RequestRedemptionsType } from "@/types/graphql/request-redemptions.types";
 import { subgraphUrl } from "@/lib/constants";
@@ -10,15 +9,17 @@ interface ResponseType {
   requestedRedemptions: RequestRedemptionsType[];
 }
 
-export const useRequestRedemptions = () => {
-  const { address } = useAccount();
-
+export const useRequestRedemptions = ({
+  userAddress,
+}: {
+  userAddress: string;
+}) => {
   const { data, isLoading, refetch } = useQuery<ResponseType>({
-    queryKey: ["requested-redemptions", address],
+    queryKey: ["requested-redemptions", userAddress],
     queryFn: async () => {
       return await request(
         subgraphUrl,
-        queryRequestedRedemptions(address!.toString().toLowerCase()),
+        queryRequestedRedemptions(userAddress!.toString().toLowerCase()),
       );
     },
     staleTime: 60 * 5,
@@ -26,7 +27,7 @@ export const useRequestRedemptions = () => {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
-    enabled: !!address,
+    enabled: !!userAddress,
   });
 
   return {

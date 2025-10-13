@@ -2,7 +2,7 @@
 "use client";
 
 import React from "react";
-import { Edit, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import ButtonCopy from "@/components/copy/button-copy";
@@ -197,16 +197,6 @@ export default function Wallets() {
       {wallets.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 border border-dashed border-gray-300 rounded-lg">
           <p className="text-gray-500 mb-4">No wallets found</p>
-          <EditWalletSheet
-            existingWallets={wallets}
-            trigger={
-              <Button className="flex items-center gap-2" variant="outline">
-                <Plus className="w-4 h-4" />
-                Add Your First Wallet
-              </Button>
-            }
-            onWalletUpdate={handleWalletUpdate}
-          />
         </div>
       ) : (
         <table className="w-full text-black">
@@ -266,14 +256,6 @@ export default function Wallets() {
                   </td>
                   <td className="py-3">
                     <div className="flex justify-end items-center gap-2">
-                      <EditWalletSheet
-                        existingWallets={wallets}
-                        trigger={
-                          <Edit className="text-gray-800 w-5 h-5 cursor-pointer hover:text-gray-600" />
-                        }
-                        wallet={wallet}
-                        onWalletUpdate={handleWalletUpdate}
-                      />
                       {canDelete ? (
                         <AlertDialog>
                           <AlertDialogTrigger asChild>

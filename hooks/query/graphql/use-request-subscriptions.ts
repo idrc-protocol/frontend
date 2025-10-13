@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import request from "graphql-request";
-import { useAccount } from "wagmi";
 
 import { RequestSubscriptionType } from "@/types/graphql/request-subscriptions.types";
 import { subgraphUrl } from "@/lib/constants";
@@ -10,15 +9,17 @@ interface ResponseType {
   requestedSubscriptions: RequestSubscriptionType[];
 }
 
-export const useRequestSubscriptions = () => {
-  const { address } = useAccount();
-
+export const useRequestSubscriptions = ({
+  userAddress,
+}: {
+  userAddress: string;
+}) => {
   const { data, isLoading, refetch } = useQuery<ResponseType>({
-    queryKey: ["requested-subscriptions", address],
+    queryKey: ["requested-subscriptions", userAddress],
     queryFn: async () => {
       return await request(
         subgraphUrl,
-        queryRequestedSubscriptions(address!.toString().toLowerCase()),
+        queryRequestedSubscriptions(userAddress!.toString().toLowerCase()),
       );
     },
     staleTime: 60 * 5,
@@ -26,7 +27,7 @@ export const useRequestSubscriptions = () => {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
-    enabled: !!address,
+    enabled: !!userAddress,
   });
 
   return {

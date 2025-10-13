@@ -14,6 +14,8 @@ import { useRequestSubscriptions } from "@/hooks/query/graphql/use-request-subsc
 import { assetsInfo } from "@/data/asset-info";
 import { formatNumber } from "@/lib/helper/number";
 import { Badge } from "@/components/ui/badge";
+import { useSession } from "@/lib/auth-client";
+import { useWallets } from "@/hooks/query/api/use-wallets";
 
 interface Transaction {
   id: string;
@@ -139,10 +141,17 @@ function ActivitySkeleton() {
 }
 
 export default function Activity() {
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
+
+  const { data: wallets = [], isLoading: isLoadingWallets } =
+    useWallets(userId);
+  const walletAddress = wallets[0]?.address;
+
   const { data: subscriptions, isLoading: isLoadingSubscriptions } =
-    useRequestSubscriptions();
+    useRequestSubscriptions({ userAddress: walletAddress as string });
   const { data: redemptions, isLoading: isLoadingRedemptions } =
-    useRequestRedemptions();
+    useRequestRedemptions({ userAddress: walletAddress as string });
 
   const transactions: Transaction[] = React.useMemo(() => {
     const subs = subscriptions.map((sub) => ({
@@ -159,8 +168,35 @@ export default function Activity() {
     );
   }, [subscriptions, redemptions]);
 
-  const isLoading = isLoadingSubscriptions || isLoadingRedemptions;
+  const isLoading =
+    isLoadingWallets || isLoadingSubscriptions || isLoadingRedemptions;
   const assetInfo = assetsInfo[0];
+
+  if (!session?.user) {
+    return (
+      <div className="flex flex-col gap-10">
+        <div className="flex items-center gap-2">
+          <span className="text-black text-2xl font-medium">
+            Account Activity
+          </span>
+          <ButtonTooltip
+            className="mt-1"
+            iconSize={5}
+            text="This section displays all mint and redeem activities within IDRC Protocol. Please note that bridge, convert, and transfer transactions are not included."
+          />
+        </div>
+        <Card className="p-5">
+          <CardContent className="flex flex-col gap-5">
+            <div className="flex flex-col justify-center items-center min-h-40 gap-2">
+              <p className="text-sm text-neutral-500 max-w-sm text-center">
+                Please sign in to view your account activity.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-10">
