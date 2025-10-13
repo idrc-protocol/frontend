@@ -9,7 +9,7 @@ import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { InputFloating } from "@/components/ui/input-floating";
 
-export function SignInForm() {
+export function LoginForm() {
   const router = useRouter();
   const t = useTranslations("Auth.Login");
   const [emailOrUsername, setEmailOrUsername] = useState("");

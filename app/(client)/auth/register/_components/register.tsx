@@ -4,8 +4,7 @@ import { useTranslations } from "next-intl";
 
 import ButtonSignin from "@/components/auth/button-signin";
 import LocaleSwitcher from "@/components/locale-switcher";
-
-import { SignUpForm } from "@/components/auth/auth/register-form";
+import { RegisterForm } from "@/components/auth/register-form";
 
 export default function Register() {
   const t = useTranslations("Auth.Register");
@@ -30,7 +29,7 @@ export default function Register() {
 
           <span className="text-center text-sm">{t("orDivider")}</span>
 
-          <SignUpForm />
+          <RegisterForm />
 
           <div className="flex items-center justify-center gap-1 text-sm">
             <span>{t("hasAccountText")}</span>

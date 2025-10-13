@@ -5,8 +5,7 @@ import { useTranslations } from "next-intl";
 import ButtonSignin from "@/components/auth/button-signin";
 import ForgotPasswordForm from "@/components/auth/forgot-password-form";
 import LocaleSwitcher from "@/components/locale-switcher";
-
-import { SignInForm } from "@/components/auth/auth/login-form";
+import { LoginForm } from "@/components/auth/login-form";
 
 export default function Login() {
   const t = useTranslations("Auth.Login");
@@ -25,7 +24,7 @@ export default function Login() {
         </div>
 
         <div className="grid gap-4 px-0.5">
-          <SignInForm />
+          <LoginForm />
 
           <div className="w-full flex justify-end -mt-3">
             <ForgotPasswordForm>
