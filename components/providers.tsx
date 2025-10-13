@@ -1,6 +1,6 @@
 "use client";
 
-import "@/lib/polyfills";
+// import "@/lib/polyfills";
 import "@rainbow-me/rainbowkit/styles.css";
 
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
