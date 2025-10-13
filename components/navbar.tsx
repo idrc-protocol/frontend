@@ -1,5 +1,10 @@
 "use client";
-import { IconDropletHalf, IconMenu, IconWorld } from "@tabler/icons-react";
+import {
+  IconDropletHalf,
+  IconMenu,
+  IconUser,
+  IconWorld,
+} from "@tabler/icons-react";
 import { SearchIcon, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -38,6 +43,14 @@ const navigationMenu = [
     type: "link" as const,
     icon: <IconDropletHalf size={25} stroke={1} />,
     desc: "Educational resources on global markets",
+  },
+  {
+    id: "account",
+    label: "Account",
+    href: "/account",
+    type: "link" as const,
+    icon: <IconUser size={25} stroke={1} />,
+    desc: "Manage your account settings",
   },
 ];
 

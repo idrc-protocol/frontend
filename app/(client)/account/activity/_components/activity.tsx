@@ -189,132 +189,207 @@ export default function Activity() {
                 </p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full table-fixed">
-                  <colgroup>
-                    <col className="w-[15%]" />
-                    <col className="w-[15%]" />
-                    <col className="w-[12%]" />
-                    <col className="w-[15%]" />
-                    <col className="w-[18%]" />
-                    <col className="w-[15%]" />
-                    <col className="w-[10%]" />
-                  </colgroup>
+              <>
+                <div className="md:hidden flex flex-col gap-4">
+                  {transactions.map((tx) => {
+                    const amount = Number(tx.amount) / 1e18;
+                    const shares = Number(tx.shares) / 1e18;
+                    const date = new Date(Number(tx.blockTimestamp) * 1000);
+                    const shortHash = `${tx.transactionHash.slice(0, 6)}...${tx.transactionHash.slice(-4)}`;
 
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left text-sm font-normal pb-2">
-                        Type
-                      </th>
-                      <th className="text-left text-sm font-normal pb-2">
-                        Asset
-                      </th>
-                      <th className="text-center text-sm font-normal pb-2">
-                        Network
-                      </th>
-                      <th className="text-right text-sm font-normal pb-2">
-                        Amount
-                      </th>
-                      <th className="text-right text-sm font-normal pb-2">
-                        Shares
-                      </th>
-                      <th className="text-center text-sm font-normal pb-2">
-                        Date
-                      </th>
-                      <th className="text-center text-sm font-normal pb-2">
-                        Tx Hash
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {transactions.map((tx) => {
-                      const amount = Number(tx.amount) / 1e18;
-                      const shares = Number(tx.shares) / 1e18;
-                      const date = new Date(Number(tx.blockTimestamp) * 1000);
-                      const shortHash = `${tx.transactionHash.slice(0, 6)}...${tx.transactionHash.slice(-4)}`;
-
-                      return (
-                        <tr key={tx.id} className="border-b hover:bg-gray-50">
-                          <td className="py-3">
-                            <Badge
-                              className="text-xs"
-                              variant={
-                                tx.type === "subscription"
-                                  ? "default"
-                                  : "secondary"
-                              }
-                            >
-                              {tx.type === "subscription" ? "Buy" : "Sell"}
-                            </Badge>
-                          </td>
-                          <td className="py-3">
-                            <div className="flex items-center gap-1">
-                              <FallbackImage
-                                alt={assetInfo.symbol}
-                                className="inline w-4 h-4"
-                                fallback={FALLBACK_IMAGE}
-                                height={200}
-                                src={assetInfo.iconSrc}
-                                width={200}
-                              />
-                              <span className="font-medium text-sm truncate">
-                                {assetInfo.symbol}
-                              </span>
-                            </div>
-                          </td>
-
-                          <td className="py-3 text-center">
+                    return (
+                      <div
+                        key={tx.id}
+                        className="border rounded-lg p-4 space-y-3 hover:bg-gray-50"
+                      >
+                        <div className="flex items-center justify-between">
+                          <Badge
+                            className="text-xs"
+                            variant={
+                              tx.type === "subscription"
+                                ? "default"
+                                : "secondary"
+                            }
+                          >
+                            {tx.type === "subscription" ? "Buy" : "Sell"}
+                          </Badge>
+                          <div className="flex items-center gap-1">
                             <FallbackImage
-                              alt="Chain"
+                              alt={assetInfo.symbol}
                               className="inline w-4 h-4"
                               fallback={FALLBACK_IMAGE}
                               height={200}
-                              src="/images/chains/base.webp"
+                              src={assetInfo.iconSrc}
                               width={200}
                             />
-                          </td>
+                            <span className="font-medium text-sm">
+                              {assetInfo.symbol}
+                            </span>
+                          </div>
+                        </div>
 
-                          <td className="py-3 text-sm font-medium text-right">
-                            {formatNumber(amount, {
-                              decimals: 2,
-                              thousandSeparator: ",",
-                            })}
-                          </td>
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div>
+                            <p className="text-gray-500 text-xs">Amount</p>
+                            <p className="font-medium">
+                              {formatNumber(amount, {
+                                decimals: 2,
+                                thousandSeparator: ",",
+                              })}
+                            </p>
+                          </div>
+                          <div className="flex items-end flex-col">
+                            <p className="text-gray-500 text-xs">Shares</p>
+                            <p className="font-medium">
+                              {formatNumber(shares, {
+                                decimals: 2,
+                                thousandSeparator: ",",
+                              })}
+                            </p>
+                          </div>
+                        </div>
 
-                          <td className="py-3 text-sm font-medium text-right">
-                            {formatNumber(shares, {
-                              decimals: 2,
-                              thousandSeparator: ",",
-                            })}
-                          </td>
-
-                          <td className="py-3 text-xs text-center text-gray-600">
-                            <div className="flex flex-col">
-                              <span>{date.toLocaleDateString()}</span>
-                              <span className="text-gray-400">
-                                {date.toLocaleTimeString()}
-                              </span>
+                        <div className="flex items-center justify-between text-xs pt-2 border-t">
+                          <div className="text-gray-600">
+                            <div>{date.toLocaleDateString()}</div>
+                            <div className="text-gray-400">
+                              {date.toLocaleTimeString()}
                             </div>
-                          </td>
+                          </div>
+                          <a
+                            className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline"
+                            href={`https://sepolia.basescan.org/tx/${tx.transactionHash}`}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                          >
+                            {shortHash}
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
 
-                          <td className="py-3 text-center">
-                            <a
-                              className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 hover:underline"
-                              href={`https://sepolia.basescan.org/tx/${tx.transactionHash}`}
-                              rel="noopener noreferrer"
-                              target="_blank"
-                            >
-                              {shortHash}
-                              <ExternalLink className="h-3 w-3" />
-                            </a>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full min-w-[800px]">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left text-sm font-normal pb-2 px-2">
+                          Type
+                        </th>
+                        <th className="text-left text-sm font-normal pb-2 px-2">
+                          Asset
+                        </th>
+                        <th className="text-center text-sm font-normal pb-2 px-2">
+                          Network
+                        </th>
+                        <th className="text-right text-sm font-normal pb-2 px-2">
+                          Amount
+                        </th>
+                        <th className="text-right text-sm font-normal pb-2 px-2">
+                          Shares
+                        </th>
+                        <th className="text-center text-sm font-normal pb-2 px-2">
+                          Date
+                        </th>
+                        <th className="text-center text-sm font-normal pb-2 px-2">
+                          Tx Hash
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {transactions.map((tx) => {
+                        const amount = Number(tx.amount) / 1e18;
+                        const shares = Number(tx.shares) / 1e18;
+                        const date = new Date(Number(tx.blockTimestamp) * 1000);
+                        const shortHash = `${tx.transactionHash.slice(0, 6)}...${tx.transactionHash.slice(-4)}`;
+
+                        return (
+                          <tr key={tx.id} className="border-b hover:bg-gray-50">
+                            <td className="py-3 px-2">
+                              <Badge
+                                className="text-xs"
+                                variant={
+                                  tx.type === "subscription"
+                                    ? "default"
+                                    : "secondary"
+                                }
+                              >
+                                {tx.type === "subscription" ? "Buy" : "Sell"}
+                              </Badge>
+                            </td>
+                            <td className="py-3 px-2">
+                              <div className="flex items-center gap-1">
+                                <FallbackImage
+                                  alt={assetInfo.symbol}
+                                  className="inline w-4 h-4 flex-shrink-0"
+                                  fallback={FALLBACK_IMAGE}
+                                  height={200}
+                                  src={assetInfo.iconSrc}
+                                  width={200}
+                                />
+                                <span className="font-medium text-sm whitespace-nowrap">
+                                  {assetInfo.symbol}
+                                </span>
+                              </div>
+                            </td>
+
+                            <td className="py-3 px-2 text-center">
+                              <FallbackImage
+                                alt="Chain"
+                                className="inline w-4 h-4"
+                                fallback={FALLBACK_IMAGE}
+                                height={200}
+                                src="/images/chains/base.webp"
+                                width={200}
+                              />
+                            </td>
+
+                            <td className="py-3 px-2 text-sm font-medium text-right whitespace-nowrap">
+                              {formatNumber(amount, {
+                                decimals: 2,
+                                thousandSeparator: ",",
+                              })}
+                            </td>
+
+                            <td className="py-3 px-2 text-sm font-medium text-right whitespace-nowrap">
+                              {formatNumber(shares, {
+                                decimals: 2,
+                                thousandSeparator: ",",
+                              })}
+                            </td>
+
+                            <td className="py-3 px-2 text-xs text-center text-gray-600">
+                              <div className="flex flex-col">
+                                <span className="whitespace-nowrap">
+                                  {date.toLocaleDateString()}
+                                </span>
+                                <span className="text-gray-400 whitespace-nowrap">
+                                  {date.toLocaleTimeString()}
+                                </span>
+                              </div>
+                            </td>
+
+                            <td className="py-3 px-2 text-center">
+                              <a
+                                className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 hover:underline whitespace-nowrap"
+                                href={`https://sepolia.basescan.org/tx/${tx.transactionHash}`}
+                                rel="noopener noreferrer"
+                                target="_blank"
+                              >
+                                {shortHash}
+                                <ExternalLink className="h-3 w-3" />
+                              </a>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>
