@@ -29,7 +29,7 @@ export default function Onboarding() {
     }
 
     if (!session?.user) {
-      router.push("/auth/sign-in");
+      router.push("/auth/auth/login");
 
       return;
     }

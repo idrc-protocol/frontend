@@ -3,8 +3,9 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 import ButtonSignin from "@/components/auth/button-signin";
-import { SignUpForm } from "@/components/auth/sign-up-form";
 import LocaleSwitcher from "@/components/locale-switcher";
+
+import { SignUpForm } from "@/components/auth/auth/register-form";
 
 export default function Register() {
   const t = useTranslations("Auth.Register");

@@ -36,7 +36,7 @@ export function UserProfile() {
 
   if (!session?.user) {
     return (
-      <Button variant="outline" onClick={() => router.push("/sign-in")}>
+      <Button variant="outline" onClick={() => router.push("/auth/login")}>
         Sign In
       </Button>
     );

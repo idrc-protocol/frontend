@@ -226,7 +226,7 @@ export default function Asset({ symbol }: { symbol: string }) {
         canTrade: false,
         actionButton: {
           text: "Sign In to Trade",
-          onClick: () => router.push("/auth/sign-in"),
+          onClick: () => router.push("/auth/auth/login"),
           variant: "default" as const,
         },
         statusMessage: `Please sign in to start transaction`,
