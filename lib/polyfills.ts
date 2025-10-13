@@ -49,20 +49,27 @@ if (typeof globalThis !== "undefined") {
     globalThis.sessionStorage = globalThis.localStorage;
   }
 
-  if (typeof window !== "undefined") {
-    let originalEthereum = (window as any).ethereum;
+  // Only set up ethereum property if it doesn't already exist
+  // This prevents conflicts with browser wallet extensions
+  if (typeof window !== "undefined" && !(window as any).ethereum) {
+    try {
+      let originalEthereum = (window as any).ethereum;
 
-    Object.defineProperty(window, "ethereum", {
-      get() {
-        return originalEthereum;
-      },
-      set(value) {
-        if (!originalEthereum || originalEthereum === undefined) {
-          originalEthereum = value;
-        }
-      },
-      configurable: true,
-    });
+      Object.defineProperty(window, "ethereum", {
+        get() {
+          return originalEthereum;
+        },
+        set(value) {
+          if (!originalEthereum || originalEthereum === undefined) {
+            originalEthereum = value;
+          }
+        },
+        configurable: true,
+      });
+    } catch (error) {
+      // Silently fail if ethereum property is already defined by extensions
+      // This is expected behavior when wallet extensions are present
+    }
   }
 }
 
