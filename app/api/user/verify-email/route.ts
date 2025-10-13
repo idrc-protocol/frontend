@@ -25,8 +25,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Verify email matches the session user
+    if (email !== session.user.email) {
+      return NextResponse.json(
+        { error: "Email does not match your account" },
+        { status: 400 },
+      );
+    }
+
+    // Use Better Auth's sign-in/email-otp endpoint to verify the OTP
     const verificationResult = await fetch(
-      `${process.env.BETTER_AUTH_URL}/api/auth/verify-email`,
+      `${process.env.BETTER_AUTH_URL}/api/auth/sign-in/email-otp`,
       {
         method: "POST",
         headers: {
@@ -37,14 +46,20 @@ export async function POST(request: NextRequest) {
     );
 
     if (!verificationResult.ok) {
-      const errorData = await verificationResult.json();
+      const errorText = await verificationResult.text();
+      let errorMessage = "Invalid verification code";
 
-      return NextResponse.json(
-        { error: errorData.error || "Invalid verification code" },
-        { status: 400 },
-      );
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        // If response is not JSON, use default error message
+      }
+
+      return NextResponse.json({ error: errorMessage }, { status: 400 });
     }
 
+    // Update user's email verification status
     await prisma.user.update({
       where: { id: session.user.id },
       data: { emailVerified: true },
@@ -55,6 +70,7 @@ export async function POST(request: NextRequest) {
       message: "Email verified successfully",
     });
   } catch (error: any) {
+    console.error("Email verification error:", error);
     return NextResponse.json(
       { error: error.message || "Failed to verify email" },
       { status: 500 },
