@@ -28,8 +28,12 @@ export const calculateIdrxAmount = (
 
   if (isNaN(assetNum) || assetNum === 0) return 0;
 
-  const priceInIdrx =
-    Number(price) / Math.pow(10, BASE_SEPOLIA_TOKENS.IDRX.decimals);
+  // Contract formula: amount = (shares * price) / PRECISION
+  // PRECISION = 1e18 from Hub contract
+  const PRECISION = 1e18;
+  
+  // Convert price from bigint to number and apply contract formula
+  const idrxAmount = (assetNum * Number(price)) / PRECISION;
 
-  return assetNum * priceInIdrx;
+  return idrxAmount;
 };

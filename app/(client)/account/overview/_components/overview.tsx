@@ -205,7 +205,6 @@ export default function Overview() {
         </CardContent>
       </Card>
 
-      {/* Connected Wallets Section */}
       <Card className="p-5">
         <CardContent className="flex flex-col gap-5">
           <div className="flex items-center justify-between">
@@ -292,7 +291,6 @@ export default function Overview() {
         </CardContent>
       </Card>
 
-      {/* Asset Portfolio Section */}
       <Card className="p-5">
         <CardContent className="flex flex-col gap-5">
           <div className="flex items-center justify-between">

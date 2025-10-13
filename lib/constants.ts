@@ -1,10 +1,10 @@
 export const contractAddresses = {
-  IDRXToken: "0x06ecC38c1a44dEb8CAbD310fD0Ca6b4a7e37caa5" as HexAddress,
+  IDRXToken: "0x6e2E24f95fd1adCE62e36037D9FC522A896051Fd" as HexAddress,
   IDRCImplementation:
-    "0x8AB249c084596558BAcf197F4be1245e4e9D5D40" as HexAddress,
-  HubImplementation: "0x9A4C1f3A97AeA8196398Bd1783cE1895db3a42DE" as HexAddress,
-  IDRCProxy: "0xcfbD89B4A6d5f54621b2EAF534200D4E4c1d2D7E" as HexAddress,
-  HubProxy: "0x6d340b02eCCFd59CEd8544dAC3eE3b585819edc5" as HexAddress,
+    "0x7a4d35cE9690F1B394C5aEdF8CCD1DD4e09164F6" as HexAddress,
+  HubImplementation: "0xB452E11A63F19511C1773fF7eE30e3d8D2AF136E" as HexAddress,
+  IDRCProxy: "0x4cB76a45a22e069D1aC9A4a82cb4623ad2C9053D" as HexAddress,
+  HubProxy: "0xC1443A755D6C8e2057f51a79055f124cDbDfB506" as HexAddress,
 } as const;
 
 export const subgraphUrl =

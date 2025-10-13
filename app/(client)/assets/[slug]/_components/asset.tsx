@@ -124,7 +124,7 @@ export default function Asset({ symbol }: { symbol: string }) {
   const userId = session?.user?.id;
   const { data: userStatus } = useOnboardingStatus(userId);
 
-  const { balance: idrcBalance } = useBalanceCustom({
+  const { balanceNormalized: idrcBalance } = useBalanceCustom({
     tokenIDRC: true,
   });
 

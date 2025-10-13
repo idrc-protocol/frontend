@@ -444,7 +444,7 @@ body {
   }
 }
 
-/* Cloudinary widget z-index fixes */
+
 .cloudinary-widget-overlay,
 .cloudinary-widget,
 #cloudinary-widget,
@@ -459,18 +459,18 @@ body {
   z-index: 10000 !important;
 }
 
-/* Widget backdrop */
+
 .cloudinary-widget .cloudinary-widget-backdrop {
   z-index: 9999 !important;
 }
 
-/* Widget content */
+
 .cloudinary-widget .cloudinary-widget-content {
   z-index: 10000 !important;
   position: relative;
 }
 
-/* More specific Cloudinary selectors */
+
 div[class*="cloudinary"],
 form[class*="cloudinary"],
 .cloudinary_fileupload,
@@ -480,37 +480,37 @@ form[class*="cloudinary"],
   pointer-events: auto !important;
 }
 
-/* Ensure Cloudinary modals are above everything */
+
 .cloudinary-upload-widget .cloudinary-upload-widget-container {
   z-index: 10001 !important;
   position: fixed !important;
 }
 
-/* Fix for any overlay blocking clicks */
+
 .cloudinary-upload-widget-overlay {
   z-index: 10000 !important;
   pointer-events: auto !important;
 }
 
-/* Ensure widget content is clickable */
+
 .cloudinary-upload-widget * {
   pointer-events: auto !important;
 }
 
-/* When widget is open, ensure all Cloudinary elements are above dialogs */
+
 body.cloudinary-widget-open [class*="cloudinary"],
 body.cloudinary-widget-open .cloudinary-upload-widget,
 body.cloudinary-widget-open #cloudinary-widget {
   z-index: 10002 !important;
 }
 
-/* Cloudinary portal should never interfere with page interactions */
+
 #cloudinary-portal {
   pointer-events: none !important;
   z-index: 10000 !important;
 }
 
-/* Only cloudinary widgets inside the portal should be clickable */
+
 #cloudinary-portal [class*="cloudinary"],
 #cloudinary-portal .cloudinary-upload-widget,
 #cloudinary-portal .cloudinary-widget {
@@ -518,7 +518,7 @@ body.cloudinary-widget-open #cloudinary-widget {
   z-index: 10001 !important;
 }
 
-/* Ensure widget overlays are clickable */
+
 #cloudinary-portal [class*="cloudinary-widget"] * {
   pointer-events: auto !important;
 }

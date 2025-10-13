@@ -9,46 +9,6 @@ async function main() {
 
   const chains = [
     {
-      name: 'Ethereum',
-      symbol: 'ETH',
-      network: 'ethereum',
-      chainId: 1,
-      rpcUrl: 'https://eth.llamarpc.com',
-      explorerUrl: 'https://etherscan.io',
-    },
-    {
-      name: 'Base',
-      symbol: 'BASE',
-      network: 'base',
-      chainId: 8453,
-      rpcUrl: 'https://mainnet.base.org',
-      explorerUrl: 'https://basescan.org',
-    },
-    {
-      name: 'Polygon',
-      symbol: 'MATIC',
-      network: 'polygon',
-      chainId: 137,
-      rpcUrl: 'https://polygon.llamarpc.com',
-      explorerUrl: 'https://polygonscan.com',
-    },
-    {
-      name: 'Arbitrum',
-      symbol: 'ARB',
-      network: 'arbitrum',
-      chainId: 42161,
-      rpcUrl: 'https://arbitrum.llamarpc.com',
-      explorerUrl: 'https://arbiscan.io',
-    },
-    {
-      name: 'Optimism',
-      symbol: 'OP',
-      network: 'optimism',
-      chainId: 10,
-      rpcUrl: 'https://optimism.llamarpc.com',
-      explorerUrl: 'https://optimistic.etherscan.io',
-    },
-    {
       name: 'Base Sepolia',
       symbol: 'BASE SEPOLIA',
       network: 'base-sepolia',

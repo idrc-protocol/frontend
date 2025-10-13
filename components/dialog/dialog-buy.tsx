@@ -1,8 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import { useAccount, useSwitchChain } from "wagmi";
-import { Loader2 } from "lucide-react";
+import { useAccount, useSwitchChain, useDisconnect } from "wagmi";
+import { Loader2, Wallet as WalletIcon } from "lucide-react";
 import { parseUnits } from "viem";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 import { AssetInfo } from "@/app/(client)/assets/[slug]/_components/asset";
 import { formatNumber } from "@/lib/helper/number";
@@ -16,6 +17,8 @@ import {
   useHubPrice,
   calculateIdrxAmount,
 } from "@/hooks/query/contract/use-hub-price";
+import { useWallets } from "@/hooks/query/api/use-wallets";
+import { useSession } from "@/lib/auth-client";
 
 import { Button } from "../ui/button";
 import {
@@ -45,8 +48,16 @@ export default function DialogBuy({
   calculatedCurrentAmount?: string;
   onClose?: () => void;
 }) {
-  const { chainId: currentChainId, address: userAddress } = useAccount();
+  const {
+    chainId: currentChainId,
+    address: userAddress,
+    isConnected,
+  } = useAccount();
   const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
+  const { disconnect } = useDisconnect();
+  const { openConnectModal } = useConnectModal();
+  const { data: session } = useSession();
+  const { data: userWallets } = useWallets(session?.user?.id);
 
   const subscription = useSubscription();
   const [showTransactionDialog, setShowTransactionDialog] =
@@ -60,6 +71,17 @@ export default function DialogBuy({
 
   const isCorrectChain = currentChainId === selectedChainId;
   const isWrongChain = !!currentChainId && !!selectedChainId && !isCorrectChain;
+
+  const registeredWallet = React.useMemo(() => {
+    if (!userWallets || !selectedChainId) return null;
+
+    return userWallets.find((w) => w.chain.chainId === selectedChainId);
+  }, [userWallets, selectedChainId]);
+
+  const isWalletMismatch =
+    isConnected &&
+    registeredWallet &&
+    userAddress?.toLowerCase() !== registeredWallet.address.toLowerCase();
 
   const { data: priceFeed } = usePriceFeed({
     amountFromUsd: Number(calculatedCurrentAmount),
@@ -75,6 +97,16 @@ export default function DialogBuy({
   const handleSwitchChain = () => {
     if (!switchChain || !selectedChainId) return;
     switchChain({ chainId: selectedChainId });
+  };
+
+  const handleConnectCorrectWallet = async () => {
+    disconnect();
+
+    setTimeout(() => {
+      if (openConnectModal) {
+        openConnectModal();
+      }
+    }, 300);
   };
 
   const handleConfirmPurchase = () => {
@@ -203,12 +235,37 @@ export default function DialogBuy({
                     )}
                   </div>
 
+                  {isWalletMismatch && registeredWallet && (
+                    <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <WalletIcon className="w-5 h-5 text-yellow-600 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-medium text-yellow-900">
+                            Wallet Address Mismatch
+                          </p>
+                          <p className="text-sm text-yellow-800 mt-1">
+                            Your connected wallet ({userAddress?.slice(0, 6)}...
+                            {userAddress?.slice(-4)}) doesn&apos;t match your
+                            registered wallet (
+                            {registeredWallet.address.slice(0, 6)}...
+                            {registeredWallet.address.slice(-4)}) for this
+                            network.
+                          </p>
+                          <p className="text-sm text-yellow-800 mt-1">
+                            Please connect the correct wallet to continue.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {Number(userBalance) < Number(idrxAmountNeeded) &&
-                  selectedTokenSymbol ? (
+                  selectedTokenSymbol &&
+                  !isWalletMismatch ? (
                     <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                       <p className="text-sm font-medium text-red-900">
                         Insufficient balance to complete this purchase. You need
-                        approximately{" "}
+                        about{" "}
                         {formatNumber(
                           Number(idrxAmountNeeded) - Number(userBalance),
                           {
@@ -229,7 +286,9 @@ export default function DialogBuy({
                         .
                       </p>
                     </div>
-                  ) : selectedChainId && selectedTokenSymbol ? (
+                  ) : selectedChainId &&
+                    selectedTokenSymbol &&
+                    !isWalletMismatch ? (
                     <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-sm font-medium text-blue-900">
                         You will buy{" "}
@@ -264,7 +323,17 @@ export default function DialogBuy({
             >
               Cancel
             </Button>
-            {isWrongChain ? (
+            {!isConnected ? (
+              <Button className="h-12" onClick={openConnectModal}>
+                <WalletIcon className="w-4 h-4 mr-2" />
+                Connect Wallet
+              </Button>
+            ) : isWalletMismatch ? (
+              <Button className="h-12" onClick={handleConnectCorrectWallet}>
+                <WalletIcon className="w-4 h-4 mr-2" />
+                Connect Correct Wallet
+              </Button>
+            ) : isWrongChain ? (
               <Button
                 className="h-12"
                 disabled={isSwitchingChain}
@@ -305,7 +374,6 @@ export default function DialogBuy({
         </DialogContent>
       </Dialog>
 
-      {/* Multi-step transaction dialog */}
       <MultiStepTransactionDialog
         currentStep={subscription.currentStep}
         description={`Purchasing ${formatNumber(buyAmount, { decimals: 0, thousandSeparator: "," })} ${assetInfo?.symbol} with IDRX`}

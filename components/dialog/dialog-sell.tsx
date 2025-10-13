@@ -1,8 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import { useAccount, useSwitchChain } from "wagmi";
-import { Loader2 } from "lucide-react";
+import { useAccount, useSwitchChain, useDisconnect } from "wagmi";
+import { Loader2, Wallet as WalletIcon } from "lucide-react";
 import { parseUnits } from "viem";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 import { AssetInfo } from "@/app/(client)/assets/[slug]/_components/asset";
 import { formatNumber } from "@/lib/helper/number";
@@ -16,6 +17,8 @@ import {
   useHubPrice,
   calculateIdrxAmount,
 } from "@/hooks/query/contract/use-hub-price";
+import { useWallets } from "@/hooks/query/api/use-wallets";
+import { useSession } from "@/lib/auth-client";
 
 import { Button } from "../ui/button";
 import {
@@ -45,8 +48,16 @@ export default function DialogSell({
   calculatedCurrentAmount?: string;
   onClose?: () => void;
 }) {
-  const { chainId: currentChainId, address: userAddress } = useAccount();
+  const {
+    chainId: currentChainId,
+    address: userAddress,
+    isConnected,
+  } = useAccount();
   const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
+  const { disconnect } = useDisconnect();
+  const { openConnectModal } = useConnectModal();
+  const { data: session } = useSession();
+  const { data: userWallets } = useWallets(session?.user?.id);
 
   const redeem = useRedeem();
   const [showTransactionDialog, setShowTransactionDialog] =
@@ -61,6 +72,17 @@ export default function DialogSell({
   const isCorrectChain = currentChainId === selectedChainId;
   const isWrongChain = !!currentChainId && !!selectedChainId && !isCorrectChain;
 
+  const registeredWallet = React.useMemo(() => {
+    if (!userWallets || !selectedChainId) return null;
+
+    return userWallets.find((w) => w.chain.chainId === selectedChainId);
+  }, [userWallets, selectedChainId]);
+
+  const isWalletMismatch =
+    isConnected &&
+    registeredWallet &&
+    userAddress?.toLowerCase() !== registeredWallet.address.toLowerCase();
+
   const { data: priceFeed } = usePriceFeed({
     amountFromUsd: Number(calculatedCurrentAmount),
   });
@@ -68,13 +90,23 @@ export default function DialogSell({
   const { price: hubPrice } = useHubPrice();
   const idrxAmountToReceive = calculateIdrxAmount(sellAmount, hubPrice);
 
-  const { balance: idrcBalance } = useBalanceCustom({
+  const { balanceNormalized: idrcBalance } = useBalanceCustom({
     tokenIDRC: true,
   });
 
   const handleSwitchChain = () => {
     if (!switchChain || !selectedChainId) return;
     switchChain({ chainId: selectedChainId });
+  };
+
+  const handleConnectCorrectWallet = async () => {
+    disconnect();
+
+    setTimeout(() => {
+      if (openConnectModal) {
+        openConnectModal();
+      }
+    }, 300);
   };
 
   const handleConfirmSell = () => {
@@ -193,26 +225,52 @@ export default function DialogSell({
                     )}
                   </div>
 
-                  {/* Asset Balance Info Box */}
-                  {selectedChainId && selectedTokenSymbol && (
-                    <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">
-                          Your {assetInfo?.symbol} Balance:
-                        </span>
-                        <span className="text-sm font-medium text-gray-900">
-                          {formatNumber(Number(idrcBalance), {
-                            decimals: 2,
-                            thousandSeparator: ",",
-                          })}{" "}
-                          {assetInfo?.symbol}
-                        </span>
+                  {isWalletMismatch && registeredWallet && (
+                    <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <WalletIcon className="w-5 h-5 text-yellow-600 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-medium text-yellow-900">
+                            Wallet Address Mismatch
+                          </p>
+                          <p className="text-sm text-yellow-800 mt-1">
+                            Your connected wallet ({userAddress?.slice(0, 6)}...
+                            {userAddress?.slice(-4)}) doesn&apos;t match your
+                            registered wallet (
+                            {registeredWallet.address.slice(0, 6)}...
+                            {registeredWallet.address.slice(-4)}) for this
+                            network.
+                          </p>
+                          <p className="text-sm text-yellow-800 mt-1">
+                            Please connect the correct wallet to continue.
+                          </p>
+                        </div>
                       </div>
                     </div>
                   )}
 
+                  {selectedChainId &&
+                    selectedTokenSymbol &&
+                    !isWalletMismatch && (
+                      <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">
+                            Your {assetInfo?.symbol} Balance:
+                          </span>
+                          <span className="text-sm font-medium text-gray-900">
+                            {formatNumber(Number(idrcBalance), {
+                              decimals: 2,
+                              thousandSeparator: ",",
+                            })}{" "}
+                            {assetInfo?.symbol}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
                   {Number(idrcBalance) < Number(sellAmount) &&
-                  selectedTokenSymbol ? (
+                  selectedTokenSymbol &&
+                  !isWalletMismatch ? (
                     <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                       <p className="text-sm font-medium text-red-900">
                         Insufficient {assetInfo?.symbol} balance to complete
@@ -239,7 +297,8 @@ export default function DialogSell({
                     </div>
                   ) : selectedChainId &&
                     selectedTokenSymbol &&
-                    Number(sellAmount) > 0 ? (
+                    Number(sellAmount) > 0 &&
+                    !isWalletMismatch ? (
                     <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-sm font-medium text-blue-900">
                         You will sell{" "}
@@ -274,7 +333,17 @@ export default function DialogSell({
             >
               Cancel
             </Button>
-            {isWrongChain ? (
+            {!isConnected ? (
+              <Button className="h-12" onClick={openConnectModal}>
+                <WalletIcon className="w-4 h-4 mr-2" />
+                Connect Wallet
+              </Button>
+            ) : isWalletMismatch ? (
+              <Button className="h-12" onClick={handleConnectCorrectWallet}>
+                <WalletIcon className="w-4 h-4 mr-2" />
+                Connect Correct Wallet
+              </Button>
+            ) : isWrongChain ? (
               <Button
                 className="h-12"
                 disabled={isSwitchingChain}
@@ -315,7 +384,6 @@ export default function DialogSell({
         </DialogContent>
       </Dialog>
 
-      {/* Multi-step transaction dialog */}
       <MultiStepTransactionDialog
         currentStep={redeem.currentStep}
         description={`Selling ${formatNumber(sellAmount, { decimals: 0, thousandSeparator: "," })} ${assetInfo?.symbol} for IDRX`}

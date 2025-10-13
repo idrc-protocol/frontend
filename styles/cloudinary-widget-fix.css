@@ -1,44 +1,44 @@
-/* Fix Cloudinary widget z-index issues */
 
-/* Cloudinary widget overlay */
+
+
 .cloudinary-widget-overlay {
   z-index: 9999 !important;
 }
 
-/* Cloudinary widget container */
+
 .cloudinary-widget {
   z-index: 9999 !important;
 }
 
-/* Cloudinary upload widget */
+
 #cloudinary-widget {
   z-index: 9999 !important;
 }
 
-/* All Cloudinary related elements */
+
 [class*="cloudinary"] {
   z-index: 9999 !important;
 }
 
-/* Widget backdrop */
+
 .cloudinary-widget .cloudinary-widget-backdrop {
   z-index: 9998 !important;
 }
 
-/* Widget content */
+
 .cloudinary-widget .cloudinary-widget-content {
   z-index: 9999 !important;
   position: relative;
 }
 
-/* Ensure widget is above dialog overlays */
+
 .cloudinary-widget-wrapper,
 .cloudinary-upload-widget,
 .cld-upload-widget {
   z-index: 10000 !important;
 }
 
-/* Widget iframe if present */
+
 .cloudinary-widget iframe {
   z-index: 10000 !important;
 }
