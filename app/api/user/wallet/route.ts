@@ -37,6 +37,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid chain ID" }, { status: 400 });
     }
 
+    const existingWallet = await prisma.wallet.findUnique({
+      where: {
+        address_chainId: {
+          address,
+          chainId: chain.id,
+        },
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    if (existingWallet && existingWallet.userId !== userId) {
+      return NextResponse.json(
+        { error: "This wallet address is already registered by another user" },
+        { status: 409 },
+      );
+    }
+
     const wallet = await prisma.wallet.upsert({
       where: {
         userId_chainId: {
@@ -61,7 +80,16 @@ export async function POST(request: NextRequest) {
       success: true,
       wallet,
     });
-  } catch {
+  } catch (error) {
+    if (error && typeof error === "object" && "code" in error) {
+      if (error.code === "P2002") {
+        return NextResponse.json(
+          { error: "This wallet address is already registered" },
+          { status: 409 },
+        );
+      }
+    }
+
     return NextResponse.json(
       { error: "Failed to add wallet" },
       { status: 500 },
