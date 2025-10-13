@@ -283,16 +283,8 @@ export default function Overview() {
   }, 0);
 
   const idrxUsdValue = Number(convertedToUsd) || 0;
-  const formattedIdrxUsdBalance = formatNumber(idrxUsdValue, {
-    decimals: 2,
-    thousandSeparator: ",",
-  });
 
   const totalPortfolioUsd = idrxUsdValue + totalAssetValueUsd;
-  const formattedTotalPortfolioUsd = formatNumber(totalPortfolioUsd, {
-    decimals: 2,
-    thousandSeparator: ",",
-  });
 
   return (
     <div className="flex flex-col py-5 gap-6">
@@ -333,7 +325,7 @@ export default function Overview() {
         <div className="flex flex-col gap-1">
           <div className="flex items-end gap-2">
             <span className="text-4xl text-black font-medium">
-              {formatNumber(formattedTotalPortfolioUsd, {
+              {formatNumber(totalPortfolioUsd, {
                 decimals: 2,
                 thousandSeparator: ",",
                 prefix: "$",
@@ -366,7 +358,7 @@ export default function Overview() {
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="text-2xl text-black font-medium">
-                {formatNumber(formattedIdrxUsdBalance, {
+                {formatNumber(idrxUsdValue, {
                   decimals: 2,
                   thousandSeparator: ",",
                   prefix: "$",
@@ -429,11 +421,22 @@ export default function Overview() {
                   })}
                 </td>
 
-                <td className="py-2 text-sm font-medium text-end">
-                  {formatNumber(idrxBalanceNumber, {
-                    decimals: 2,
-                    thousandSeparator: ",",
-                  })}
+                <td className="py-3 text-sm font-medium text-right">
+                  <div className="flex flex-col items-end">
+                    <span>
+                      {formatNumber(idrxBalanceNumber, {
+                        decimals: 2,
+                        thousandSeparator: ",",
+                      })}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      ≈ $
+                      {formatNumber(idrxUsdValue, {
+                        decimals: 2,
+                        thousandSeparator: ",",
+                      })}
+                    </span>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -454,7 +457,7 @@ export default function Overview() {
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="text-2xl text-black font-medium">
-                {formatNumber(idrcBalanceNumber, {
+                {formatNumber(totalAssetValueUsd, {
                   decimals: 2,
                   thousandSeparator: ",",
                   prefix: "$",
@@ -497,7 +500,7 @@ export default function Overview() {
                         src={asset.iconSrc}
                         width={32}
                       />
-                      <span className="font-medium text-sm">
+                      <span className="font-medium text-sm -mt-0.5">
                         {asset.symbol}
                       </span>
                     </div>

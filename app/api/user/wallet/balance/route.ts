@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createPublicClient, http, formatUnits } from "viem";
-import { base } from "viem/chains";
+import { baseSepolia } from "viem/chains";
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     }
 
     const client = createPublicClient({
-      chain: base,
+      chain: baseSepolia,
       transport: http(),
     });
 
@@ -73,8 +73,8 @@ export async function GET(request: NextRequest) {
             args: [wallet.address as `0x${string}`],
           });
 
-          const idrxFormatted = formatUnits(idrxBalance as bigint, 6);
-          const idrcFormatted = formatUnits(idrcBalance as bigint, 6);
+          const idrxFormatted = formatUnits(idrxBalance as bigint, 2);
+          const idrcFormatted = formatUnits(idrcBalance as bigint, 18);
 
           return {
             walletId: wallet.id,
