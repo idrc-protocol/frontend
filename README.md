@@ -1,1 +1,1 @@
-# IDRC Frontend
+# IDRC Protocol - Frontend
