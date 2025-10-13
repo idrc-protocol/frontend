@@ -10,7 +10,7 @@ const protectedRoutes = [
   "/onboard",
 ];
 
-const authRoutes = ["/auth/login", "/auth/register"];
+const authRoutes = ["/auth/login", "/auth/register", "/sign-in", "/sign-up"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
