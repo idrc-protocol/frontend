@@ -17,6 +17,7 @@ export default async function AuthLayout({
           src="/images/background/auth.webp"
         />
       </div>
+      {children}
       <div className="hidden lg:block relative h-[20vh] lg:h-full w-full p-5 rounded-2xl overflow-hidden">
         <FallbackImage
           priority
@@ -28,7 +29,6 @@ export default async function AuthLayout({
           width={1000}
         />
       </div>
-      {children}
     </div>
   );
 }

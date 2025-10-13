@@ -9,6 +9,8 @@ import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { InputFloating } from "@/components/ui/input-floating";
 
+import ForgotPasswordForm from "./forgot-password-form";
+
 export function LoginForm() {
   const router = useRouter();
   const t = useTranslations("Auth.Login");
@@ -85,6 +87,13 @@ export function LoginForm() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
+      <div className="w-full flex justify-end -mt-3">
+        <ForgotPasswordForm>
+          <span className="underline text-black text-sm cursor-pointer hover:opacity-80 transition-opacity">
+            {t("forgotPasswordLink")}
+          </span>
+        </ForgotPasswordForm>
+      </div>
       <Button
         className="w-full mt-2 py-7 text-md"
         disabled={isLoading}

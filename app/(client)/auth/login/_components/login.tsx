@@ -3,7 +3,6 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 import ButtonSignin from "@/components/auth/button-signin";
-import ForgotPasswordForm from "@/components/auth/forgot-password-form";
 import LocaleSwitcher from "@/components/locale-switcher";
 import { LoginForm } from "@/components/auth/login-form";
 
@@ -25,14 +24,6 @@ export default function Login() {
 
         <div className="grid gap-4 px-0.5">
           <LoginForm />
-
-          <div className="w-full flex justify-end -mt-3">
-            <ForgotPasswordForm>
-              <span className="underline text-black text-sm cursor-pointer hover:opacity-80 transition-opacity">
-                {t("forgotPasswordLink")}
-              </span>
-            </ForgotPasswordForm>
-          </div>
 
           <div className="flex items-center justify-center gap-1 text-sm">
             <span>{t("noAccountText")}</span>
