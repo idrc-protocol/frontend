@@ -13,6 +13,7 @@ export default async function AuthLayout({
           priority
           alt="Authentication Background"
           className="object-cover object-center lg:hidden block"
+          draggable={false}
           sizes="50vw"
           src="/images/background/auth.webp"
         />
@@ -23,6 +24,7 @@ export default async function AuthLayout({
           priority
           alt="Authentication Background"
           className="w-full h-full object-contain hidden lg:block"
+          draggable={false}
           height={1920}
           sizes="50vw"
           src="/images/background/auth.webp"
