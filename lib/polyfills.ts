@@ -49,8 +49,6 @@ if (typeof globalThis !== "undefined") {
     globalThis.sessionStorage = globalThis.localStorage;
   }
 
-  // Only set up ethereum property if it doesn't already exist
-  // This prevents conflicts with browser wallet extensions
   if (typeof window !== "undefined" && !(window as any).ethereum) {
     try {
       let originalEthereum = (window as any).ethereum;
@@ -66,10 +64,7 @@ if (typeof globalThis !== "undefined") {
         },
         configurable: true,
       });
-    } catch (error) {
-      // Silently fail if ethereum property is already defined by extensions
-      // This is expected behavior when wallet extensions are present
-    }
+    } catch {}
   }
 }
 
