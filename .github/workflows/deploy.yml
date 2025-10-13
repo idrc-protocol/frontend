@@ -24,45 +24,92 @@ jobs:
             cd ${{ secrets.DEPLOY_PATH || '/home/kizovps/idrc/frontend' }}
             
             echo "=========================================="
-            echo "Deployment Started"
+            echo "🚀 Deployment Started"
             echo "=========================================="
             
-            # Load NVM first
+            # Setup environment - Load NVM and ensure Node/pnpm/pm2 are available
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             
-            echo "[1/5] Pulling latest changes..."
-            git fetch origin 2>&1 | grep -v "^From" | grep -v "^Already" || true
-            git pull origin main 2>&1 | grep -v "^Already" || true
-            echo "✓ Code updated"
+            # Add pnpm to PATH if not available
+            export PNPM_HOME="$HOME/.local/share/pnpm"
+            export PATH="$PNPM_HOME:$PATH"
             
-            echo "[2/5] Installing dependencies..."
-            pnpm install --frozen-lockfile 2>&1 | grep -E "(up to date|progress|Done)" || true
+            echo "📍 Current directory: $(pwd)"
+            echo "🔧 Node version: $(node --version)"
+            echo "📦 pnpm version: $(pnpm --version)"
+            echo "⚙️  PM2 version: $(pm2 --version)"
+            echo ""
+            
+            # Step 1: Pull latest changes from Git
+            echo "[1/6] 📥 Pulling latest changes..."
+            git fetch origin
+            BEFORE_COMMIT=$(git rev-parse HEAD)
+            git pull origin main
+            AFTER_COMMIT=$(git rev-parse HEAD)
+            
+            if [ "$BEFORE_COMMIT" = "$AFTER_COMMIT" ]; then
+              echo "✓ No new changes detected (already up to date)"
+            else
+              echo "✓ Code updated from $BEFORE_COMMIT to $AFTER_COMMIT"
+            fi
+            echo ""
+            
+            # Step 2: Install dependencies
+            echo "[2/6] 📦 Installing dependencies..."
+            pnpm install --frozen-lockfile
             echo "✓ Dependencies installed"
+            echo ""
             
-            echo "[3/5] Building application..."
-            pnpm build 2>&1 | tail -5
-            echo "✓ Build completed"
+            # Step 3: Build application
+            echo "[3/6] 🔨 Building application..."
+            pnpm build
+            echo "✓ Build completed successfully"
+            echo ""
             
-            echo "[4/5] Restarting PM2..."
-            pm2 restart idrc-frontend 2>&1 | grep -v "│" | grep -v "┌" | grep -v "└" | grep -v "Process" || true
-            pm2 save > /dev/null 2>&1
-            echo "✓ PM2 restarted"
+            # Step 4: Reload PM2 (graceful reload for zero-downtime)
+            echo "[4/6] 🔄 Reloading PM2 application..."
             
-            echo "[5/5] Verifying deployment..."
+            # Check if process exists
+            if pm2 describe idrc-frontend > /dev/null 2>&1; then
+              echo "Found existing PM2 process, performing reload..."
+              pm2 reload idrc-frontend --update-env
+              echo "✓ PM2 process reloaded"
+            else
+              echo "PM2 process not found, starting new process..."
+              pm2 start pnpm --name "idrc-frontend" -- start
+              echo "✓ PM2 process started"
+            fi
+            echo ""
+            
+            # Step 5: Save PM2 process list
+            echo "[5/6] 💾 Saving PM2 configuration..."
+            pm2 save --force
+            echo "✓ PM2 configuration saved"
+            echo ""
+            
+            # Step 6: Verify deployment
+            echo "[6/6] ✅ Verifying deployment..."
             sleep 3
             
-            # Check PM2 status without showing sensitive details
-            if pm2 jlist 2>/dev/null | jq -r '.[] | select(.name=="idrc-frontend") | .pm2_env.status' 2>/dev/null | grep -q "online"; then
-              echo "✅ Deployment successful"
-              echo "Application: idrc-frontend is running"
+            # Check PM2 status and show detailed info
+            PM2_STATUS=$(pm2 jlist 2>/dev/null | jq -r '.[] | select(.name=="idrc-frontend") | .pm2_env.status' 2>/dev/null || echo "unknown")
+            
+            if [ "$PM2_STATUS" = "online" ]; then
+              echo "✅ Deployment successful!"
+              echo ""
+              echo "📊 Application Status:"
+              pm2 show idrc-frontend | grep -E "(status|uptime|restarts|memory|cpu)" | head -6
             else
-              echo "❌ Deployment verification failed"
+              echo "❌ Deployment verification failed - Status: $PM2_STATUS"
+              echo "📋 Checking PM2 logs for errors..."
+              pm2 logs idrc-frontend --lines 20 --nostream
               exit 1
             fi
             
+            echo ""
             echo "=========================================="
-            echo "Deployment Complete"
+            echo "✅ Deployment Complete"
             echo "=========================================="
 
   notify:
@@ -74,10 +121,10 @@ jobs:
     steps:
       - name: Success
         if: needs.deploy.result == 'success'
-        run: echo "✅ Deployment successful"
+        run: echo "✅ Deployment successful - Application is live!"
           
       - name: Failed
         if: needs.deploy.result != 'success'
         run: |
-          echo "❌ Deployment failed"
+          echo "❌ Deployment failed - Check logs for details"
           exit 1
