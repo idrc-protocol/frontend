@@ -282,7 +282,7 @@ export default function Onboarding() {
                   <div className="flex justify-between text-sm">
                     <span>Eligibility</span>
                     <span className="underline">
-                      Global (Non-US); other restrictions apply
+                      Global; other restrictions apply
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
