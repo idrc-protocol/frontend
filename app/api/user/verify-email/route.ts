@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Verify email matches the session user
     if (email !== session.user.email) {
       return NextResponse.json(
         { error: "Email does not match your account" },
@@ -32,30 +33,48 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const verificationResult = await fetch(
-      `${process.env.BETTER_AUTH_URL}/api/auth/sign-in/email-otp`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    // Better Auth stores OTPs with format: "email-verification-otp-{email}"
+    const identifier = `email-verification-otp-${email}`;
+
+    // Check if OTP exists and is valid in the verification table
+    // Get the most recent one first
+    const verification = await prisma.verification.findFirst({
+      where: {
+        identifier: identifier,
+        expiresAt: {
+          gt: new Date(),
         },
-        body: JSON.stringify({ email, otp }),
       },
-    );
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
 
-    if (!verificationResult.ok) {
-      const errorText = await verificationResult.text();
-      let errorMessage = "Invalid verification code";
-
-      try {
-        const errorData = JSON.parse(errorText);
-
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {}
-
-      return NextResponse.json({ error: errorMessage }, { status: 400 });
+    if (!verification) {
+      return NextResponse.json(
+        { error: "Invalid or expired OTP" },
+        { status: 400 },
+      );
     }
 
+    // Better Auth stores the value as "OTP:counter" format
+    const storedOtp = verification.value.split(":")[0];
+
+    if (storedOtp !== otp) {
+      return NextResponse.json(
+        { error: "Invalid or expired OTP" },
+        { status: 400 },
+      );
+    }
+
+    // Delete the used OTP
+    await prisma.verification.delete({
+      where: {
+        id: verification.id,
+      },
+    });
+
+    // Update user's email verification status
     await prisma.user.update({
       where: { id: session.user.id },
       data: { emailVerified: true },
@@ -66,6 +85,7 @@ export async function POST(request: NextRequest) {
       message: "Email verified successfully",
     });
   } catch (error: any) {
+    console.error("Email verification error:", error);
     return NextResponse.json(
       { error: error.message || "Failed to verify email" },
       { status: 500 },
