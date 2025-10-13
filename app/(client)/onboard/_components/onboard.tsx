@@ -12,6 +12,15 @@ import { useMobile } from "@/hooks/window/useMobile";
 
 import WalletFirstStep from "./wallet-step/wallet-first-step";
 import VerifyFirstStep from "./verify-step/verify-first-step";
+import KycStep1 from "./verify-step/kyc-step-1";
+import KycStep2 from "./verify-step/kyc-step-2";
+import KycStep3 from "./verify-step/kyc-step-3";
+import KycStep4 from "./verify-step/kyc-step-4";
+import KycStepLoading from "./verify-step/kyc-step-loading";
+import KycStepSuccess from "./verify-step/kyc-step-success";
+import KycStepFailed from "./verify-step/kyc-step-failed";
+import KycSupportContact from "./verify-step/kyc-support-contact";
+import KybStep from "./verify-step/kyb-step";
 import { DesktopSidebar } from "./onboard-desktop-sidebar";
 import { MobileProgress } from "./onboard-mobile-progress";
 import OnboardSuccess from "./onboard-success";
@@ -125,6 +134,42 @@ export default function Onboard() {
       updateUserData({ [field]: actualValue });
     };
 
+  const handleBackToInitial = () => {
+    onboardState.setVerificationFlow("initial");
+    onboardState.setKycStep(1);
+  };
+
+  const handleKycNext = () => {
+    if (onboardState.kycStep === 1) {
+      onboardState.setKycStep(2);
+    } else if (onboardState.kycStep === 2) {
+      onboardState.setKycStep(3);
+    } else if (onboardState.kycStep === 3) {
+      onboardState.setKycStep(4);
+    } else if (onboardState.kycStep === 4) {
+      onboardState.setKycStep("loading");
+      setTimeout(() => {
+        onboardState.setKycStep("success");
+      }, 2000);
+    } else if (onboardState.kycStep === "success") {
+      onboardState.completeStep("verify");
+      onboardState.setCurrentStep("wallet");
+      setActualCurrentStep("wallet");
+    }
+  };
+
+  const handleKycBack = () => {
+    if (onboardState.kycStep === 1) {
+      handleBackToInitial();
+    } else if (onboardState.kycStep === 2) {
+      onboardState.setKycStep(1);
+    } else if (onboardState.kycStep === 3) {
+      onboardState.setKycStep(2);
+    } else if (onboardState.kycStep === 4) {
+      onboardState.setKycStep(3);
+    }
+  };
+
   const renderStepContent = () => {
     if (actualCurrentStep === "success") {
       return <OnboardSuccess />;
@@ -135,6 +180,122 @@ export default function Onboard() {
     }
 
     if (actualCurrentStep === "verify") {
+      if (onboardState.verificationFlow === "kyc") {
+        if (onboardState.kycStep === "support-contact") {
+          return (
+            <KycSupportContact
+              formData={{
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                investmentAmount: parseInt(userData.purchaseAmount),
+                verificationType: userData.verificationType as any,
+                identityType: "KTP" as any,
+                identityNumber: userData.identityNumber || "",
+                birthdate: userData.birthdate || new Date(),
+                birthplace: userData.birthplace || "",
+                address: userData.address || "",
+                state: userData.state || "",
+                country: userData.selectedCountry || "",
+                zipNumber: userData.zipCode || "",
+                phoneNumber: userData.phoneNumber || "",
+                selectedCountry: userData.selectedCountry || "",
+                otherCitizenships: userData.otherCitizenships || "",
+                applicantId: userData.applicantId,
+              }}
+              onBack={handleBackToInitial}
+            />
+          );
+        }
+        if (onboardState.kycStep === 1) {
+          return <KycStep1 onBack={handleKycBack} onNext={handleKycNext} />;
+        }
+        if (onboardState.kycStep === 2) {
+          return (
+            <KycStep2
+              otherCitizenships={userData.otherCitizenships}
+              selectedCountry={userData.selectedCountry}
+              setOtherCitizenships={(value: string) =>
+                updateUserData({ otherCitizenships: value })
+              }
+              setSelectedCountry={(value: string) =>
+                updateUserData({ selectedCountry: value })
+              }
+              onBack={handleKycBack}
+              onNext={handleKycNext}
+            />
+          );
+        }
+        if (onboardState.kycStep === 3) {
+          return (
+            <KycStep3
+              address={userData.address}
+              birthdate={userData.birthdate}
+              birthplace={userData.birthplace}
+              handleAddressChange={handleInputChange("address")}
+              handleBirthdateChange={(date: Date | undefined) =>
+                updateUserData({ birthdate: date })
+              }
+              handleBirthplaceChange={handleInputChange("birthplace")}
+              handlePhoneNumberChange={(value: string) =>
+                updateUserData({ phoneNumber: value })
+              }
+              handleStateChange={handleInputChange("state")}
+              handleZipCodeChange={handleInputChange("zipCode")}
+              phoneNumber={userData.phoneNumber}
+              state={userData.state}
+              zipCode={userData.zipCode}
+              onBack={handleKycBack}
+              onNext={handleKycNext}
+            />
+          );
+        }
+        if (onboardState.kycStep === 4) {
+          return (
+            <KycStep4
+              onApplicantIdChange={(applicantId: string) =>
+                updateUserData({ applicantId })
+              }
+              onBack={handleKycBack}
+              onNext={handleKycNext}
+            />
+          );
+        }
+        if (onboardState.kycStep === "loading") {
+          return <KycStepLoading />;
+        }
+        if (onboardState.kycStep === "success") {
+          return <KycStepSuccess onNext={handleKycNext} />;
+        }
+        if (onboardState.kycStep === "failed") {
+          return <KycStepFailed />;
+        }
+      }
+
+      if (onboardState.verificationFlow === "kyb") {
+        return (
+          <KybStep
+            businessAddress={""}
+            companyName={""}
+            contactPhone={""}
+            legalRegistrationType={""}
+            registrationNumber={""}
+            setBusinessAddress={() => {}}
+            setCompanyName={() => {}}
+            setContactPhone={() => {}}
+            setLegalRegistrationType={() => {}}
+            setRegistrationNumber={() => {}}
+            setUbo={() => {}}
+            ubo={""}
+            onBack={handleBackToInitial}
+            onSubmit={() => {
+              onboardState.completeStep("verify");
+              onboardState.setCurrentStep("wallet");
+              setActualCurrentStep("wallet");
+            }}
+          />
+        );
+      }
+
       return (
         <VerifyFirstStep
           firstName={userData.firstName}

@@ -1,5 +1,5 @@
 import { Check } from "lucide-react";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface SelectOption {
   value: string;
@@ -32,6 +32,10 @@ export const SelectFloating: React.FC<SelectProps> = ({
   const [selectedValue, setSelectedValue] = useState(value || "");
   const [isFocused, setIsFocused] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setSelectedValue(value || "");
+  }, [value]);
 
   const hasValue = selectedValue !== "";
   const displayLabel = label || placeholder;
