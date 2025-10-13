@@ -87,7 +87,11 @@ export default function DialogBuy({
     amountFromUsd: Number(calculatedCurrentAmount),
   });
 
-  const { price: hubPrice } = useHubPrice();
+  const {
+    price: hubPrice,
+    isLoading: isLoadingHubPrice,
+    isError: isErrorHubPrice,
+  } = useHubPrice();
   const idrxAmountNeeded = calculateIdrxAmount(buyAmount, hubPrice);
 
   const { balanceNormalized: userBalance } = useBalanceCustom({
@@ -259,23 +263,55 @@ export default function DialogBuy({
                     </div>
                   )}
 
-                  {Number(userBalance) < Number(idrxAmountNeeded) &&
+                  {!idrxAmountNeeded &&
                   selectedTokenSymbol &&
                   !isWalletMismatch ? (
+                    <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <p className="text-sm font-medium text-yellow-900">
+                        Unable to calculate required IDRX amount
+                      </p>
+                      <p className="text-sm text-yellow-800 mt-1">
+                        {isLoadingHubPrice
+                          ? "Loading price data from blockchain..."
+                          : isErrorHubPrice
+                            ? "Error fetching price from contract. Please ensure you're connected to the correct network."
+                            : !hubPrice
+                              ? "Hub price is not available. Please try connecting your wallet or refreshing the page."
+                              : "Please check if the asset price is available or try again later."}
+                      </p>
+                    </div>
+                  ) : Number(userBalance) < Number(idrxAmountNeeded) &&
+                    selectedTokenSymbol &&
+                    !isWalletMismatch &&
+                    idrxAmountNeeded &&
+                    idrxAmountNeeded > 0 ? (
                     <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                       <p className="text-sm font-medium text-red-900">
-                        Insufficient balance to complete this purchase. You need
-                        about{" "}
-                        {formatNumber(
-                          Number(idrxAmountNeeded) - Number(userBalance),
-                          {
-                            decimals: 0,
-                            thousandSeparator: ",",
-                          },
-                        )}{" "}
-                        {selectedTokenSymbol}.
+                        Insufficient balance to complete this purchase.{" "}
+                        {Number(userBalance) === 0 ? (
+                          <>
+                            You need{" "}
+                            {formatNumber(Number(idrxAmountNeeded), {
+                              decimals: 0,
+                              thousandSeparator: ",",
+                            })}{" "}
+                            {selectedTokenSymbol}.
+                          </>
+                        ) : (
+                          <>
+                            You need about{" "}
+                            {formatNumber(
+                              Number(idrxAmountNeeded) - Number(userBalance),
+                              {
+                                decimals: 0,
+                                thousandSeparator: ",",
+                              },
+                            )}{" "}
+                            more {selectedTokenSymbol}.
+                          </>
+                        )}
                       </p>
-                      <p className="text-sm text-red-800">
+                      <p className="text-sm text-red-800 mt-1">
                         Tip: You can mint test tokens{" "}
                         <Link
                           className="underline text-blue-500"
@@ -288,7 +324,8 @@ export default function DialogBuy({
                     </div>
                   ) : selectedChainId &&
                     selectedTokenSymbol &&
-                    !isWalletMismatch ? (
+                    !isWalletMismatch &&
+                    idrxAmountNeeded ? (
                     <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-sm font-medium text-blue-900">
                         You will buy{" "}
@@ -297,7 +334,7 @@ export default function DialogBuy({
                           thousandSeparator: ",",
                           suffix: ` ${assetInfo?.symbol}`,
                         })}{" "}
-                        for with{" "}
+                        for{" "}
                         {formatNumber(Number(idrxAmountNeeded), {
                           decimals: 0,
                           thousandSeparator: ",",
@@ -355,6 +392,7 @@ export default function DialogBuy({
                   !selectedChainId ||
                   !selectedTokenSymbol ||
                   !calculatedCurrentAmount ||
+                  !idrxAmountNeeded ||
                   Number(userBalance) < Number(idrxAmountNeeded) ||
                   subscription.isLoading
                 }

@@ -27,9 +27,8 @@ export const calculateIdrxAmount = (
 
   if (isNaN(assetNum) || assetNum === 0) return 0;
 
-  const PRECISION = 1e18;
-
-  const idrxAmount = (assetNum * Number(price)) / PRECISION;
+  const pricePerIdrc = Number(price) / 100;
+  const idrxAmount = assetNum * pricePerIdrc;
 
   return idrxAmount;
 };
