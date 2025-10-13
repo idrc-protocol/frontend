@@ -7,6 +7,15 @@ import { PrismaClient } from "@prisma/client";
 import { sendPasswordResetEmail } from "./resend";
 import { sendVerificationOTP } from "./resend";
 
+// Load environment variables explicitly for production
+if (process.env.NODE_ENV === "production" && typeof window === "undefined") {
+  try {
+    require("dotenv").config({ path: ".env" });
+  } catch {
+    // Silently fail if dotenv is not available or .env doesn't exist
+  }
+}
+
 const prisma = new PrismaClient();
 
 export const auth = betterAuth({
@@ -24,8 +33,9 @@ export const auth = betterAuth({
   },
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      enabled: true,
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     },
   },
   secret: process.env.BETTER_AUTH_SECRET!,

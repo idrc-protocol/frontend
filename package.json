@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "dotenv -e .env -- next build",
     "build:netlify": "pnpm install --frozen-lockfile && next build",
     "start": "next start",
     "lint": "eslint --fix",
@@ -99,6 +99,8 @@
     "@typescript-eslint/parser": "8.43.0",
     "autoprefixer": "10.4.21",
     "critters": "^0.0.25",
+    "dotenv": "^17.2.3",
+    "dotenv-cli": "^10.0.0",
     "eslint": "9.35.0",
     "eslint-config-next": "15.5.2",
     "eslint-config-prettier": "10.1.8",
