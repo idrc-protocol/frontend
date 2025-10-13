@@ -706,33 +706,43 @@ export default function Asset({ symbol }: { symbol: string }) {
                   }}
                   onKeyDown={handleKeyDown}
                 />
-                {selectedAction === "sell" && (
-                  <div
-                    className={`text-xs ${
-                      Number(currentAmount) > Number(idrcBalance)
-                        ? "text-red-500 font-medium"
-                        : "text-gray-500"
-                    }`}
-                  >
-                    Available:{" "}
-                    {formatNumber(Number(idrcBalance), {
-                      decimals: 2,
-                      thousandSeparator: ",",
-                    })}{" "}
-                    {asset.symbol}
-                    {Number(currentAmount) > Number(idrcBalance) && (
-                      <span className="ml-1">(Insufficient balance)</span>
-                    )}
-                  </div>
-                )}
+                <span className="text-sm text-muted-foreground">
+                  {(() => {
+                    return currentAmount && !isNaN(parseFloat(currentAmount))
+                      ? `$${formatNumber(calculatedCurrentAmount, { decimals: 0, thousandSeparator: "," })}`
+                      : "$0.00";
+                  })()}
+                </span>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    {(() => {
-                      return currentAmount && !isNaN(parseFloat(currentAmount))
-                        ? `$${formatNumber(calculatedCurrentAmount, { decimals: 0, thousandSeparator: "," })}`
-                        : "$0.00";
-                    })()}
-                  </span>
+                  {selectedAction === "sell" && (
+                    <div
+                      className={`text-xs ${
+                        Number(currentAmount) > Number(idrcBalance)
+                          ? "text-red-500 font-medium"
+                          : "text-gray-500"
+                      }`}
+                    >
+                      You have:{" "}
+                      {formatNumber(Number(idrcBalance), {
+                        decimals: 2,
+                        thousandSeparator: ",",
+                      })}{" "}
+                      {asset.symbol}
+                      {Number(currentAmount) > Number(idrcBalance) && (
+                        <span className="ml-1">(Insufficient balance)</span>
+                      )}
+                    </div>
+                  )}
+                  {selectedAction === "buy" && (
+                    <div className={`text-xs text-gray-500`}>
+                      You have:{" "}
+                      {formatNumber(Number(idrcBalance), {
+                        decimals: 2,
+                        thousandSeparator: ",",
+                      })}{" "}
+                      {asset.symbol}
+                    </div>
+                  )}
                   <div className="flex items-center gap-2">
                     <Button
                       className="rounded-full text-xs py-1 h-6 px-3"
@@ -1008,36 +1018,46 @@ export default function Asset({ symbol }: { symbol: string }) {
                           }}
                           onKeyDown={handleKeyDown}
                         />
-                        {selectedAction === "sell" && (
-                          <div
-                            className={`text-xs ${
-                              Number(currentAmount) > Number(idrcBalance)
-                                ? "text-red-500 font-medium"
-                                : "text-gray-500"
-                            }`}
-                          >
-                            Available:{" "}
-                            {formatNumber(Number(idrcBalance), {
-                              decimals: 2,
-                              thousandSeparator: ",",
-                            })}{" "}
-                            {asset.symbol}
-                            {Number(currentAmount) > Number(idrcBalance) && (
-                              <span className="ml-1">
-                                (Insufficient balance)
-                              </span>
-                            )}
-                          </div>
-                        )}
+                        <span className="text-sm text-muted-foreground">
+                          {(() => {
+                            return currentAmount &&
+                              !isNaN(parseFloat(currentAmount))
+                              ? `$${formatNumber(calculatedCurrentAmount)}`
+                              : "$0.00";
+                          })()}
+                        </span>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">
-                            {(() => {
-                              return currentAmount &&
-                                !isNaN(parseFloat(currentAmount))
-                                ? `$${calculatedCurrentAmount}`
-                                : "$0.00";
-                            })()}
-                          </span>
+                          {selectedAction === "sell" && (
+                            <div
+                              className={`text-xs ${
+                                Number(currentAmount) > Number(idrcBalance)
+                                  ? "text-red-500 font-medium"
+                                  : "text-gray-500"
+                              }`}
+                            >
+                              You have:{" "}
+                              {formatNumber(Number(idrcBalance), {
+                                decimals: 2,
+                                thousandSeparator: ",",
+                              })}{" "}
+                              {asset.symbol}
+                              {Number(currentAmount) > Number(idrcBalance) && (
+                                <span className="ml-1">
+                                  (Insufficient balance)
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          {selectedAction === "buy" && (
+                            <div className={`text-xs text-gray-500`}>
+                              You have:{" "}
+                              {formatNumber(Number(idrcBalance), {
+                                decimals: 2,
+                                thousandSeparator: ",",
+                              })}{" "}
+                              {asset.symbol}
+                            </div>
+                          )}
                           <div className="flex items-center gap-2">
                             <Button
                               className="rounded-full text-xs py-1 h-6 px-3"

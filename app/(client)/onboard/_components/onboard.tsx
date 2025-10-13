@@ -29,7 +29,6 @@ import OnboardSuccess from "./onboard-success";
 function OnboardSkeleton() {
   return (
     <div className="flex flex-col lg:flex-row w-full min-h-screen">
-      {/* Desktop Sidebar Skeleton */}
       <div className="hidden lg:flex w-1/2 bg-primary flex-col justify-center items-center p-12">
         <div className="flex flex-col gap-8 w-full max-w-md">
           <Skeleton className="h-8 w-48 bg-white/20" />
@@ -47,7 +46,6 @@ function OnboardSkeleton() {
         </div>
       </div>
 
-      {/* Content Area Skeleton */}
       <div className="bg-white flex-1 w-full lg:w-1/2 rounded-t-3xl lg:rounded-none shadow-xl lg:shadow-none z-20 lg:z-auto min-h-[50vh] lg:min-h-screen lg:overflow-y-auto">
         <div className="flex px-12 xl:px-16 2xl:px-20 items-center justify-center w-full h-full py-8">
           <div className="w-full max-w-lg flex flex-col gap-6">

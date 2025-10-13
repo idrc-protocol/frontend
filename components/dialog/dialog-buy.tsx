@@ -55,7 +55,7 @@ export default function DialogBuy({
   } = useAccount();
   const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
   const { disconnect } = useDisconnect();
-  const { openConnectModal } = useConnectModal();
+  const { openConnectModal, connectModalOpen } = useConnectModal();
   const { data: session } = useSession();
   const { data: userWallets } = useWallets(session?.user?.id);
 
@@ -141,7 +141,7 @@ export default function DialogBuy({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={open && !connectModalOpen} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-lg min-h-[400px] justify-between flex flex-col">
           <div className="space-y-8">
             <DialogHeader>

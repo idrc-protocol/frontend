@@ -117,14 +117,22 @@ export default function EditWalletSheet({
     try {
       setIsSaving(true);
       const response = await fetch("/api/user/wallet", {
-        method: "POST",
+        method: wallet ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          address: formData.address,
-          chainId: parseInt(formData.chainId),
-        }),
+        body: JSON.stringify(
+          wallet
+            ? {
+                walletId: wallet.id,
+                address: formData.address,
+                chainId: parseInt(formData.chainId),
+              }
+            : {
+                address: formData.address,
+                chainId: parseInt(formData.chainId),
+              },
+        ),
       });
 
       if (!response.ok) {

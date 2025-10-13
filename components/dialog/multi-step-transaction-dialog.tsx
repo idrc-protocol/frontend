@@ -270,7 +270,7 @@ export function MultiStepTransactionDialog({
 
                     {index < steps.length - 1 && (
                       <div className="ml-7">
-                        <Separator className="w-full bg-neutral-800" />
+                        <Separator className="w-full bg-neutral-200" />
                       </div>
                     )}
                   </div>
