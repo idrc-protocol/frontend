@@ -229,3 +229,48 @@ export const useUpdateName = () => {
     },
   });
 };
+
+export const useInvalidateEmail = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/user/invalidate-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.error || "Failed to invalidate email verification",
+        );
+      }
+
+      return result;
+    },
+    onSuccess: async () => {
+      await authClient.getSession({ fetchOptions: { cache: "no-store" } });
+
+      queryClient.setQueryData(["session"], (oldData: any) => {
+        if (oldData?.user) {
+          return {
+            ...oldData,
+            user: {
+              ...oldData.user,
+              emailVerified: false,
+            },
+          };
+        }
+
+        return oldData;
+      });
+
+      invalidateUserDataCache(queryClient);
+      queryClient.invalidateQueries({ queryKey: ["userSettings"] });
+    },
+  });
+};

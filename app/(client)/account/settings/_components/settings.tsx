@@ -34,6 +34,7 @@ import {
   useVerifyEmail,
   useUpdateProfileImage,
   useUpdateName,
+  useInvalidateEmail,
 } from "@/hooks/query/api/use-user-settings";
 import { InputFloating } from "@/components/ui/input-floating";
 import ImageUploadBox from "@/components/upload/image-upload-box";
@@ -51,6 +52,7 @@ function SettingsContent() {
   const verifyEmailMutation = useVerifyEmail();
   const updateProfileImageMutation = useUpdateProfileImage();
   const updateNameMutation = useUpdateName();
+  const invalidateEmailMutation = useInvalidateEmail();
 
   const [isUsernameDialogOpen, setIsUsernameDialogOpen] = useState(false);
   const [isVerifyEmailDialogOpen, setIsVerifyEmailDialogOpen] = useState(false);
@@ -303,6 +305,19 @@ function SettingsContent() {
     }
   };
 
+  const handleInvalidateEmail = async () => {
+    try {
+      await invalidateEmailMutation.mutateAsync();
+      toast.success("Email verification status invalidated successfully!");
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to invalidate email verification");
+    }
+  };
+
   if (isLoadingInitial) {
     return <Loading />;
   }
@@ -435,6 +450,26 @@ function SettingsContent() {
                     >
                       <span>Verify Now</span>
                       <Mail className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+                <Separator orientation="horizontal" />
+              </>
+            )}
+            {isEmailVerified && (
+              <>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Email Verification</span>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      disabled={invalidateEmailMutation.isPending}
+                      size="sm"
+                      variant="destructive"
+                      onClick={handleInvalidateEmail}
+                    >
+                      {invalidateEmailMutation.isPending
+                        ? "Invalidating..."
+                        : "Unverify Email"}
                     </Button>
                   </div>
                 </div>

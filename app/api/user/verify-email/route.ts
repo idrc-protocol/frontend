@@ -25,7 +25,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify email matches the session user
     if (email !== session.user.email) {
       return NextResponse.json(
         { error: "Email does not match your account" },
@@ -33,11 +32,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Better Auth stores OTPs with format: "email-verification-otp-{email}"
     const identifier = `email-verification-otp-${email}`;
 
-    // Check if OTP exists and is valid in the verification table
-    // Get the most recent one first
     const verification = await prisma.verification.findFirst({
       where: {
         identifier: identifier,
@@ -46,7 +42,7 @@ export async function POST(request: NextRequest) {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 
@@ -57,7 +53,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Better Auth stores the value as "OTP:counter" format
     const storedOtp = verification.value.split(":")[0];
 
     if (storedOtp !== otp) {
@@ -67,14 +62,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Delete the used OTP
     await prisma.verification.delete({
       where: {
         id: verification.id,
       },
     });
 
-    // Update user's email verification status
     await prisma.user.update({
       where: { id: session.user.id },
       data: { emailVerified: true },
@@ -85,7 +78,6 @@ export async function POST(request: NextRequest) {
       message: "Email verified successfully",
     });
   } catch (error: any) {
-    console.error("Email verification error:", error);
     return NextResponse.json(
       { error: error.message || "Failed to verify email" },
       { status: 500 },
