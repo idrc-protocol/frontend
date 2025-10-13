@@ -40,10 +40,19 @@ const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ onChange, value }) => {
         showAdvancedOptions: false,
         showSkipCropButton: false,
         showUploadMoreButton: false,
+        sources: ["local", "url", "camera"],
+        multiple: false,
+        maxFiles: 1,
       }}
       uploadPreset="z6euuqyl"
+      onClose={() => {
+        handleWidgetClose();
+      }}
       onError={() => {
         handleWidgetClose();
+      }}
+      onOpen={() => {
+        handleWidgetOpen();
       }}
       onSuccess={(result) => {
         handleUpload(result);
@@ -58,12 +67,20 @@ const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ onChange, value }) => {
             className={`relative cursor-pointer hover:opacity-70 transition border-dashed border-2 w-full flex items-center justify-center ${
               hasImage ? "p-5" : "p-10"
             } border-neutral-300 flex flex-col justify-center items-center gap-4 text-neutral-600`}
+            type="button"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
 
-              handleWidgetOpen();
+              if (typeof window !== "undefined" && !window.cloudinary) {
+                alert(
+                  "Image upload service is loading. Please wait a moment and try again.",
+                );
 
+                return;
+              }
+
+              handleWidgetOpen();
               open?.();
             }}
           >

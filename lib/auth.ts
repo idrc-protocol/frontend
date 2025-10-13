@@ -43,6 +43,7 @@ export const auth = betterAuth({
       async sendVerificationOTP({ email, otp, type }) {
         await sendVerificationOTP(email, otp, type);
       },
+      sendVerificationOnSignUp: false,
     }),
     oneTap(),
     nextCookies(),

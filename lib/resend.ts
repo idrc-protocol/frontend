@@ -10,7 +10,9 @@ export async function sendPasswordResetEmail(
   userName?: string,
 ) {
   if (!resend) {
-    return { success: true, data: null };
+    throw new Error(
+      "Email service is not configured. Please contact support or check your environment variables.",
+    );
   }
 
   try {
@@ -161,7 +163,9 @@ export async function sendVerificationOTP(
   type: "sign-in" | "email-verification" | "forget-password",
 ) {
   if (!resend) {
-    return { success: true, data: null };
+    throw new Error(
+      "Email service is not configured. Please contact support or check your environment variables.",
+    );
   }
 
   const subjects = {
@@ -184,7 +188,7 @@ export async function sendVerificationOTP(
 
   try {
     const { data, error } = await resend.emails.send({
-      from: "support@idrc.site",
+      from: "IDRC <support@idrc.site>",
       to: email,
       subject: subjects[type],
       html: `
@@ -304,11 +308,15 @@ export async function sendVerificationOTP(
     });
 
     if (error) {
-      return { success: false, error };
+      throw new Error(
+        `Failed to send verification email: ${error.message || "Unknown error"}`,
+      );
     }
 
     return { success: true, data };
-  } catch (error) {
-    return { success: false, error };
+  } catch (error: any) {
+    throw new Error(
+      error.message || "Failed to send verification email. Please try again.",
+    );
   }
 }

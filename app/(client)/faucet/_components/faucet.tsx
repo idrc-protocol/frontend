@@ -8,6 +8,7 @@ import {
   useWaitForTransactionReceipt,
   useReadContract,
   useSwitchChain,
+  useDisconnect,
 } from "wagmi";
 import { parseUnits, formatUnits } from "viem";
 import { toast } from "sonner";
@@ -19,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { BASE_SEPOLIA_TOKENS } from "@/lib/tokens";
 import { idrxABI } from "@/lib/abis/idrx.abi";
 import { formatNumber } from "@/lib/helper/number";
+import { ConnectButtonCustom } from "@/components/wallet/connect-button-custom";
 
 const IDRX = BASE_SEPOLIA_TOKENS.IDRX;
 const REQUIRED_CHAIN_ID = baseSepolia.id;
@@ -26,6 +28,7 @@ const REQUIRED_CHAIN_ID = baseSepolia.id;
 export default function Faucet() {
   const { address, isConnected, chainId } = useAccount();
   const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
+  const { disconnect } = useDisconnect();
   const queryClient = useQueryClient();
   const [mintAmount, setMintAmount] = useState("10000000");
 
@@ -160,10 +163,13 @@ export default function Faucet() {
               <p className="text-lg font-medium text-muted-foreground mb-2">
                 Connect Your Wallet
               </p>
-              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              <p className="text-sm text-muted-foreground max-w-md mx-auto mb-6">
                 Please connect your wallet to use the faucet and mint testnet
                 IDRX
               </p>
+              <div className="flex justify-center mt-6">
+                <ConnectButtonCustom />
+              </div>
             </div>
           ) : isWrongChain ? (
             <div className="text-center py-12">
@@ -226,7 +232,7 @@ export default function Faucet() {
                   <span className="text-sm">
                     {balanceLoading
                       ? "..."
-                      : `${parseFloat(formattedBalance).toFixed(2)} IDRX`}
+                      : `${formatNumber(formattedBalance, { decimals: 2, thousandSeparator: "," })} IDRX`}
                   </span>
                   <Button
                     className="rounded-full text-xs py-1 h-6 px-3"
@@ -253,16 +259,27 @@ export default function Faucet() {
               variant="outline"
               onClick={() => setMintAmount(amount)}
             >
-              {formatNumber(parseFloat(amount), { decimals: 0 })} IDRX
+              {formatNumber(parseFloat(amount), {
+                decimals: 0,
+                thousandSeparator: ",",
+              })}{" "}
+              IDRX
             </Button>
           ))}
         </div>
       )}
 
       {isConnected && isCorrectChain && (
-        <>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Button
-            className="w-full h-14 text-lg font-semibold rounded-3xl"
+            className="rounded-full h-14"
+            variant="destructive"
+            onClick={() => disconnect()}
+          >
+            Disconnect Wallet
+          </Button>
+          <Button
+            className="w-full h-14 font-semibold rounded-3xl"
             disabled={isPending || !mintAmount || parseFloat(mintAmount) <= 0}
             size="lg"
             onClick={handleMint}
@@ -283,7 +300,7 @@ export default function Faucet() {
               </>
             )}
           </Button>
-        </>
+        </div>
       )}
 
       <div className="text-center text-sm text-muted-foreground">

@@ -257,8 +257,9 @@ function SettingsContent() {
       setOtp("");
       setOtpSent(false);
 
-      await authClient.getSession();
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } catch (err: any) {
       toast.error(err?.message || "An unexpected error occurred");
     }

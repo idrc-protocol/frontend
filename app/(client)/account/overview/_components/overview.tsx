@@ -8,27 +8,28 @@ import ButtonTooltip from "@/components/tooltip/button-tooltip";
 import { Card, CardContent } from "@/components/ui/card";
 import FallbackImage from "@/components/fallback-image";
 import { FALLBACK_IMAGE } from "@/lib/constants";
-import { useBalanceCustom } from "@/hooks/query/contract/use-balance-custom";
+import { useWallets } from "@/hooks/query/api/use-wallets";
+import { useWalletBalances } from "@/hooks/query/api/use-wallet-balances";
 import { usePriceFeed } from "@/hooks/query/api/use-price-feed";
 import { formatNumber } from "@/lib/helper/number";
 import { assetsInfo } from "@/data/asset-info";
+import { useSession } from "@/lib/auth-client";
 
 export default function Overview() {
-  const { balanceNormalized: idrxBalance } = useBalanceCustom({
-    tokenIDRX: true,
-  });
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
 
-  const { balanceNormalized: idrcBalance } = useBalanceCustom({
-    tokenIDRC: true,
-  });
+  const { data: wallets, isLoading: isLoadingWallets } = useWallets(userId);
+  const { data: balanceData, isLoading: isLoadingBalances } =
+    useWalletBalances(userId);
 
-  const idrxBalanceNumber = Number(idrxBalance) || 0;
+  const idrxBalanceNumber = Number(balanceData?.balances.idrx) || 0;
   const formattedIdrxBalance = formatNumber(idrxBalanceNumber, {
     decimals: 2,
     thousandSeparator: ",",
   });
 
-  const idrcBalanceNumber = Number(idrcBalance) || 0;
+  const idrcBalanceNumber = Number(balanceData?.balances.idrc) || 0;
   const totalAssetValueUsd = assetsInfo.reduce((total, asset) => {
     const assetPrice = parseFloat(asset.primaryMarket.price);
 
@@ -204,6 +205,93 @@ export default function Overview() {
         </CardContent>
       </Card>
 
+      {/* Connected Wallets Section */}
+      <Card className="p-5">
+        <CardContent className="flex flex-col gap-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              <span className="text-sm font-medium text-black">
+                Connected Wallets
+              </span>
+              <ButtonTooltip text="Wallets from your account stored in the database via API." />
+            </div>
+          </div>
+
+          {isLoadingWallets || isLoadingBalances ? (
+            <div className="text-sm text-gray-500">Loading wallets...</div>
+          ) : !wallets || wallets.length === 0 ? (
+            <div className="text-sm text-gray-500">No wallets connected</div>
+          ) : (
+            <table className="w-full table-fixed">
+              <colgroup>
+                <col className="w-[30%]" />
+                <col className="w-[20%]" />
+                <col className="w-[25%]" />
+                <col className="w-[25%]" />
+              </colgroup>
+
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left text-sm font-normal pb-2">
+                    Address
+                  </th>
+                  <th className="text-center text-sm font-normal pb-2">
+                    Network
+                  </th>
+                  <th className="text-right text-sm font-normal pb-2">
+                    IDRX Balance
+                  </th>
+                  <th className="text-right text-sm font-normal pb-2">
+                    IDRC Balance
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {wallets.map((wallet) => {
+                  const walletBalance = balanceData?.walletBalances.find(
+                    (wb) => wb.walletId === wallet.id,
+                  );
+
+                  return (
+                    <tr key={wallet.id} className="border-b last:border-b-0">
+                      <td className="py-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-mono truncate">
+                            {wallet.address.slice(0, 6)}...
+                            {wallet.address.slice(-4)}
+                          </span>
+                        </div>
+                      </td>
+
+                      <td className="py-3 text-center">
+                        <span className="text-sm">
+                          {wallet.chain?.network || "Unknown"}
+                        </span>
+                      </td>
+
+                      <td className="py-3 text-sm text-right font-medium">
+                        {formatNumber(Number(walletBalance?.idrx) || 0, {
+                          decimals: 2,
+                          thousandSeparator: ",",
+                        })}
+                      </td>
+
+                      <td className="py-3 text-sm text-right font-medium">
+                        {formatNumber(Number(walletBalance?.idrc) || 0, {
+                          decimals: 2,
+                          thousandSeparator: ",",
+                        })}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Asset Portfolio Section */}
       <Card className="p-5">
         <CardContent className="flex flex-col gap-5">
@@ -282,7 +370,7 @@ export default function Overview() {
                   <td className="py-3 text-sm font-medium text-right">
                     <div className="flex flex-col items-end">
                       <span>
-                        {formatNumber(Number(idrcBalance) || 0, {
+                        {formatNumber(Number(idrcBalanceNumber) || 0, {
                           decimals: 2,
                           thousandSeparator: ",",
                         })}
@@ -290,7 +378,7 @@ export default function Overview() {
                       <span className="text-xs text-gray-500">
                         ≈ $
                         {formatNumber(
-                          (Number(idrcBalance) || 0) *
+                          (Number(idrcBalanceNumber) || 0) *
                             parseFloat(asset.primaryMarket.price),
                           {
                             decimals: 2,

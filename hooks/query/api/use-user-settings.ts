@@ -115,19 +115,44 @@ export const useVerifyEmail = () => {
 
   return useMutation({
     mutationFn: async (data: { email: string; otp: string }) => {
-      const { data: result, error } = await authClient.emailOtp.verifyEmail({
-        email: data.email,
-        otp: data.otp,
+      const response = await fetch("/api/user/verify-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: data.email,
+          otp: data.otp,
+        }),
       });
 
-      if (error) {
-        throw new Error(error.message || "Invalid verification code");
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Invalid verification code");
       }
 
       return result;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await authClient.getSession({ fetchOptions: { cache: "no-store" } });
+
+      queryClient.setQueryData(["session"], (oldData: any) => {
+        if (oldData?.user) {
+          return {
+            ...oldData,
+            user: {
+              ...oldData.user,
+              emailVerified: true,
+            },
+          };
+        }
+
+        return oldData;
+      });
+
       invalidateUserDataCache(queryClient);
+      queryClient.invalidateQueries({ queryKey: ["userSettings"] });
     },
   });
 };

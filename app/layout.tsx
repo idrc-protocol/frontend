@@ -3,6 +3,7 @@ import "./globals.css";
 import { Metadata, Viewport } from "next";
 import { getMessages, getLocale } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
+import Script from "next/script";
 import React from "react";
 
 import DefaultLayout from "@/components/layout/default";
@@ -57,6 +58,10 @@ export default async function RootLayout({
   return (
     <html suppressHydrationWarning lang="en">
       <body className={`antialiased bg-background text-foreground`}>
+        <Script
+          src="https://upload-widget.cloudinary.com/global/all.js"
+          strategy="lazyOnload"
+        />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Providers>
             <DefaultLayout>{children}</DefaultLayout>
