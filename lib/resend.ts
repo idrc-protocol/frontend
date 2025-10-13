@@ -1,5 +1,11 @@
 import { Resend } from "resend";
 
+if (process.env.NODE_ENV === "production" && typeof window === "undefined") {
+  try {
+    require("dotenv").config({ path: ".env" });
+  } catch {}
+}
+
 export const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
