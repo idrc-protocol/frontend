@@ -8,8 +8,9 @@ const prisma = new PrismaClient();
 
 export async function POST(_request: NextRequest) {
   try {
+    const headersList = await headers();
     const session = await auth.api.getSession({
-      headers: await headers(),
+      headers: headersList,
     });
 
     if (!session?.user) {
@@ -19,6 +20,11 @@ export async function POST(_request: NextRequest) {
     await prisma.user.update({
       where: { id: session.user.id },
       data: { emailVerified: false },
+    });
+
+    await prisma.session.updateMany({
+      where: { userId: session.user.id },
+      data: { updatedAt: new Date() },
     });
 
     return NextResponse.json({

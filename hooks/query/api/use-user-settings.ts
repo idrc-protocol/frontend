@@ -240,6 +240,7 @@ export const useInvalidateEmail = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        cache: "no-store",
       });
 
       const result = await response.json();
@@ -255,22 +256,12 @@ export const useInvalidateEmail = () => {
     onSuccess: async () => {
       await authClient.getSession({ fetchOptions: { cache: "no-store" } });
 
-      queryClient.setQueryData(["session"], (oldData: any) => {
-        if (oldData?.user) {
-          return {
-            ...oldData,
-            user: {
-              ...oldData.user,
-              emailVerified: false,
-            },
-          };
-        }
+      queryClient.invalidateQueries({ queryKey: ["session"] });
+      queryClient.invalidateQueries({ queryKey: ["userSettings"] });
 
-        return oldData;
-      });
+      await queryClient.refetchQueries({ queryKey: ["session"] });
 
       invalidateUserDataCache(queryClient);
-      queryClient.invalidateQueries({ queryKey: ["userSettings"] });
     },
   });
 };

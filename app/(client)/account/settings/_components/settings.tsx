@@ -4,6 +4,7 @@ import React, { useState, Suspense, useEffect } from "react";
 import { Check, X, Edit2, Mail, Key, User, Camera } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +41,7 @@ import { InputFloating } from "@/components/ui/input-floating";
 import ImageUploadBox from "@/components/upload/image-upload-box";
 
 function SettingsContent() {
+  const router = useRouter();
   const { user } = useAuthContext();
   const userId = user?.id;
 
@@ -310,8 +312,20 @@ function SettingsContent() {
       await invalidateEmailMutation.mutateAsync();
       toast.success("Email verification status invalidated successfully!");
 
+      document.cookie.split(";").forEach((c) => {
+        const cookieName = c.split("=")[0].trim();
+
+        if (cookieName.includes("better-auth")) {
+          document.cookie =
+            cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        }
+      });
+
+      router.refresh();
+
       setTimeout(() => {
-        window.location.reload();
+        window.location.href =
+          window.location.href.split("?")[0] + "?refresh=" + Date.now();
       }, 500);
     } catch (err: any) {
       toast.error(err?.message || "Failed to invalidate email verification");
