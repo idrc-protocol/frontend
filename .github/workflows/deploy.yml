@@ -27,35 +27,37 @@ jobs:
             echo "Deployment Started"
             echo "=========================================="
             
+            # Load NVM first
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            
             echo "[1/5] Pulling latest changes..."
-            git fetch origin > /dev/null 2>&1
-            git pull origin main > /dev/null 2>&1
+            git fetch origin 2>&1 | grep -v "^From" | grep -v "^Already" || true
+            git pull origin main 2>&1 | grep -v "^Already" || true
             echo "✓ Code updated"
             
             echo "[2/5] Installing dependencies..."
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            pnpm install --frozen-lockfile > /dev/null 2>&1
+            pnpm install --frozen-lockfile 2>&1 | grep -E "(up to date|progress|Done)" || true
             echo "✓ Dependencies installed"
             
             echo "[3/5] Building application..."
-            pnpm build > /dev/null 2>&1
+            pnpm build 2>&1 | tail -5
             echo "✓ Build completed"
             
             echo "[4/5] Restarting PM2..."
-            pm2 restart idrc-frontend > /dev/null 2>&1
+            pm2 restart idrc-frontend 2>&1 | grep -v "│" | grep -v "┌" | grep -v "└" | grep -v "Process" || true
             pm2 save > /dev/null 2>&1
             echo "✓ PM2 restarted"
             
             echo "[5/5] Verifying deployment..."
             sleep 3
             
-            # Check PM2 status without showing details
-            if pm2 jlist | jq -r '.[] | select(.name=="idrc-frontend") | .pm2_env.status' | grep -q "online"; then
+            # Check PM2 status without showing sensitive details
+            if pm2 jlist 2>/dev/null | jq -r '.[] | select(.name=="idrc-frontend") | .pm2_env.status' 2>/dev/null | grep -q "online"; then
               echo "✅ Deployment successful"
-              echo "Application is running"
+              echo "Application: idrc-frontend is running"
             else
-              echo "❌ Deployment failed"
+              echo "❌ Deployment verification failed"
               exit 1
             fi
             
