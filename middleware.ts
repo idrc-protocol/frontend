@@ -15,7 +15,11 @@ const authRoutes = ["/auth/login", "/auth/register", "/sign-in", "/sign-up"];
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const sessionCookie = request.cookies.get("better-auth.session_token");
+  // Check for both secure (production/HTTPS) and non-secure (dev/HTTP) cookies
+  const sessionCookie =
+    request.cookies.get("__Secure-better-auth.session_token") ||
+    request.cookies.get("better-auth.session_token");
+
   const hasSession = !!sessionCookie?.value;
 
   const isProtectedRoute = protectedRoutes.some((route) =>
