@@ -111,4 +111,49 @@ export const pageMetadataConfigs = {
     description: "Create a new account to get started.",
     keywords: ["register", "signup", "create account"],
   }),
+  account: createPageMetadataConfig({
+    title: "Account",
+    description: "Manage your account settings and preferences.",
+    keywords: ["account", "profile", "settings"],
+  }),
+  accountActivity: createPageMetadataConfig({
+    title: "Account Activity",
+    description: "View your recent account activity and transactions.",
+    keywords: ["activity", "transactions", "history"],
+  }),
+  accountOnboarding: createPageMetadataConfig({
+    title: "Account Onboarding",
+    description: "Complete your account setup.",
+    keywords: ["onboarding", "setup", "getting started"],
+  }),
+  accountOverview: createPageMetadataConfig({
+    title: "Account Overview",
+    description: "View your account overview and portfolio summary.",
+    keywords: ["overview", "portfolio", "summary"],
+  }),
+  accountSettings: createPageMetadataConfig({
+    title: "Account Settings",
+    description: "Manage your account settings and preferences.",
+    keywords: ["settings", "preferences", "configuration"],
+  }),
+  accountWallets: createPageMetadataConfig({
+    title: "Wallets",
+    description: "Manage your connected wallets.",
+    keywords: ["wallets", "crypto", "blockchain"],
+  }),
+  explore: createPageMetadataConfig({
+    title: "Explore",
+    description: "Explore available assets and opportunities.",
+    keywords: ["explore", "assets", "discover"],
+  }),
+  faucet: createPageMetadataConfig({
+    title: "Faucet",
+    description: "Get test tokens for your wallet.",
+    keywords: ["faucet", "test tokens", "testnet"],
+  }),
+  asset: createPageMetadataConfig({
+    title: "Asset",
+    description: "View asset details and information.",
+    keywords: ["asset", "token", "details"],
+  }),
 };
