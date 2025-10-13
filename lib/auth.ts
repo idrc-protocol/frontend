@@ -7,13 +7,10 @@ import { PrismaClient } from "@prisma/client";
 import { sendPasswordResetEmail } from "./resend";
 import { sendVerificationOTP } from "./resend";
 
-// Load environment variables explicitly for production
 if (process.env.NODE_ENV === "production" && typeof window === "undefined") {
   try {
     require("dotenv").config({ path: ".env" });
-  } catch {
-    // Silently fail if dotenv is not available or .env doesn't exist
-  }
+  } catch {}
 }
 
 const prisma = new PrismaClient();

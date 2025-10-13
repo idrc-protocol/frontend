@@ -1,8 +1,6 @@
-// ecosystem.config.js
 const fs = require('fs');
 const path = require('path');
 
-// Load .env file
 const envFile = fs.readFileSync(path.join(__dirname, '.env'), 'utf8');
 const env = { NODE_ENV: 'production', PORT: 9000 };
 
