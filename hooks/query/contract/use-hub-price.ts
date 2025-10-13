@@ -2,7 +2,6 @@ import { useReadContract } from "wagmi";
 
 import { contractAddresses } from "@/lib/constants";
 import { hubABI } from "@/lib/abis/hub.abi";
-import { BASE_SEPOLIA_TOKENS } from "@/lib/tokens";
 
 export const useHubPrice = () => {
   const { data: price, ...rest } = useReadContract({
