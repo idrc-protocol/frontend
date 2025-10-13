@@ -2,6 +2,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { useSession } from "@/lib/auth-client";
 import Loading from "@/components/loader/loading";
@@ -28,6 +29,7 @@ import OnboardSuccess from "./onboard-success";
 export default function Onboard() {
   const router = useRouter();
   const { isMobile } = useMobile();
+  const queryClient = useQueryClient();
   const [showProgress, setShowProgress] = useState(false);
   const [actualCurrentStep, setActualCurrentStep] = useState<string | null>(
     null,
@@ -118,6 +120,16 @@ export default function Onboard() {
   const handleWalletComplete = () => {
     onboardState.completeStep("wallet");
     onboardState.setCurrentStep("success");
+    setActualCurrentStep("success");
+
+    queryClient.invalidateQueries({ queryKey: ["onboardingStatus"] });
+    queryClient.invalidateQueries({ queryKey: ["kycStatus"] });
+    queryClient.invalidateQueries({
+      predicate: (query) =>
+        query.queryKey.includes("wallet") ||
+        query.queryKey.includes("kyc") ||
+        query.queryKey.includes("onboarding"),
+    });
   };
 
   const handleInputChange =
@@ -155,6 +167,14 @@ export default function Onboard() {
       onboardState.completeStep("verify");
       onboardState.setCurrentStep("wallet");
       setActualCurrentStep("wallet");
+
+      queryClient.invalidateQueries({ queryKey: ["onboardingStatus"] });
+      queryClient.invalidateQueries({ queryKey: ["kycStatus"] });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          query.queryKey.includes("kyc") ||
+          query.queryKey.includes("onboarding"),
+      });
     }
   };
 
@@ -291,6 +311,15 @@ export default function Onboard() {
               onboardState.completeStep("verify");
               onboardState.setCurrentStep("wallet");
               setActualCurrentStep("wallet");
+
+              queryClient.invalidateQueries({ queryKey: ["onboardingStatus"] });
+              queryClient.invalidateQueries({ queryKey: ["kycStatus"] });
+              queryClient.invalidateQueries({
+                predicate: (query) =>
+                  query.queryKey.includes("kyc") ||
+                  query.queryKey.includes("kyb") ||
+                  query.queryKey.includes("onboarding"),
+              });
             }}
           />
         );
