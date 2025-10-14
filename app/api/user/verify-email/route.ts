@@ -73,6 +73,11 @@ export async function POST(request: NextRequest) {
       data: { emailVerified: true },
     });
 
+    await prisma.session.updateMany({
+      where: { userId: session.user.id },
+      data: { updatedAt: new Date() },
+    });
+
     return NextResponse.json({
       success: true,
       message: "Email verified successfully",

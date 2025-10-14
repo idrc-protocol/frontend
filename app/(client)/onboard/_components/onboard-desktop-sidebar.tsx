@@ -10,7 +10,7 @@ export const DesktopSidebar = ({
   isStepActive: (step: OnboardStep) => boolean;
   isStepCompleted: (step: string) => boolean;
 }) => (
-  <div className="bg-blue-700 text-white flex-shrink-0 lg:w-1/2 lg:min-h-screen lg:overflow-y-auto hidden lg:block">
+  <div className="bg-blue-700 text-white flex-shrink-0 lg:w-1/2 lg:min-h-svh lg:overflow-y-auto hidden lg:block">
     <div className="fixed top-0 left-0 px-4 pt-4 w-1/2 bg-gradient-to-b from-blue-700 from-80% to-transparent to-100% z-10">
       <FallbackImage
         alt="Logo"
@@ -21,7 +21,7 @@ export const DesktopSidebar = ({
       />
     </div>
 
-    <div className="flex px-12 xl:px-16 2xl:px-20 items-center justify-center w-full min-h-screen py-8">
+    <div className="flex px-12 xl:px-16 2xl:px-20 items-center justify-center w-full min-h-svh py-8">
       <div className="flex flex-col gap-5 w-full max-w-md">
         <span className="text-3xl font-semibold">Onboard Step</span>
         <ul className="flex flex-col gap-3">

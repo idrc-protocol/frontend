@@ -350,10 +350,6 @@ function SettingsContent() {
       setIsVerifyEmailDialogOpen(false);
       setOtp("");
       setOtpSent(false);
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
     } catch (err: any) {
       toast.error(err?.message || "An unexpected error occurred");
     }

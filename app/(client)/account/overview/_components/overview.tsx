@@ -302,6 +302,7 @@ export default function Overview() {
             <FallbackImage
               alt="Profile"
               className="w-auto h-auto opacity-35"
+              draggable={false}
               fallback={FALLBACK_IMAGE}
               height={1080}
               src="/images/background/map.png"

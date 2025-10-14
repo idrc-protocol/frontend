@@ -84,7 +84,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="relative flex items-start lg:items-center justify-center px-5 lg:p-8 min-h-screen">
+    <div className="relative flex items-start lg:items-center justify-center px-5 lg:p-8 min-h-svh">
       <div className="absolute top-5 right-5">
         <LocaleSwitcher />
       </div>
