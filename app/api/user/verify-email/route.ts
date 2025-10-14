@@ -70,7 +70,10 @@ export async function POST(request: NextRequest) {
 
     await prisma.user.update({
       where: { id: session.user.id },
-      data: { emailVerified: true },
+      data: {
+        emailVerified: true,
+        updatedAt: new Date(),
+      },
     });
 
     await prisma.session.updateMany({
@@ -78,10 +81,28 @@ export async function POST(request: NextRequest) {
       data: { updatedAt: new Date() },
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: "Email verified successfully",
     });
+
+    response.cookies.set("better-auth.session_data", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 0,
+    });
+
+    response.cookies.set("better-auth.session_token.cache", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 0,
+    });
+
+    return response;
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || "Failed to verify email" },

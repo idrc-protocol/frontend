@@ -25,14 +25,32 @@ export async function POST(request: NextRequest) {
     });
 
     await prisma.session.updateMany({
-      where: { userId },
+      where: { userId: session.user.id },
       data: { updatedAt: new Date() },
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       user: updatedUser,
     });
+
+    response.cookies.set("better-auth.session_data", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 0,
+    });
+
+    response.cookies.set("better-auth.session_token.cache", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 0,
+    });
+
+    return response;
   } catch {
     return NextResponse.json(
       { error: "Failed to update KYC status" },
