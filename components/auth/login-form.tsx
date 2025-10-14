@@ -54,9 +54,9 @@ export function LoginForm() {
       }
 
       if (data) {
-        toast.success("Signed in successfully!");
         router.push("/account/overview");
         router.refresh();
+        window.location.reload();
       }
     } catch (err: any) {
       const errorMessage =
