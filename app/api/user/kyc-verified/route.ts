@@ -34,21 +34,43 @@ export async function POST(request: NextRequest) {
       user: updatedUser,
     });
 
-    response.cookies.set("better-auth.session_data", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 0,
-    });
+    const isProduction = process.env.NODE_ENV === "production";
 
-    response.cookies.set("better-auth.session_token.cache", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 0,
-    });
+    if (isProduction) {
+      response.cookies.set("__Secure-better-auth.session_data", "", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 0,
+      });
+    } else {
+      response.cookies.set("better-auth.session_data", "", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 0,
+      });
+    }
+
+    if (isProduction) {
+      response.cookies.set("__Secure-better-auth.session_token.cache", "", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 0,
+      });
+    } else {
+      response.cookies.set("better-auth.session_token.cache", "", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 0,
+      });
+    }
 
     return response;
   } catch {
