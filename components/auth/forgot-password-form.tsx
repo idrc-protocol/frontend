@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { Turnstile } from "next-turnstile";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { InputFloating } from "@/components/ui/input-floating";
 import { forgetPassword } from "@/lib/auth-client";
+import { useTurnstile } from "@/hooks/captcha/use-turnstile";
 
 interface ForgotPasswordFormProps {
   children: React.ReactNode;
@@ -27,6 +29,7 @@ export default function ForgotPasswordForm({
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { turnstileToken, setTurnstileToken, userIp } = useTurnstile();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +39,12 @@ export default function ForgotPasswordForm({
       const { error } = await forgetPassword({
         email,
         redirectTo: `${window.location.origin}/auth/reset-password`,
+        fetchOptions: {
+          headers: {
+            "x-captcha-response": turnstileToken,
+            "x-captcha-user-remote-ip": userIp,
+          },
+        },
       });
 
       if (error) {
@@ -71,6 +80,14 @@ export default function ForgotPasswordForm({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+          />
+          <Turnstile
+            refreshExpired="auto"
+            retry="auto"
+            siteKey={process.env.NEXT_PUBLIC_SITE_KEY!}
+            onVerify={(token) => {
+              setTurnstileToken(token);
+            }}
           />
           <div className="flex gap-2">
             <Button

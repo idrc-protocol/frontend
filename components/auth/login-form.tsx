@@ -4,10 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { Turnstile } from "next-turnstile";
 
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { InputFloating } from "@/components/ui/input-floating";
+import { useTurnstile } from "@/hooks/captcha/use-turnstile";
 
 import ForgotPasswordForm from "./forgot-password-form";
 
@@ -17,6 +19,7 @@ export function LoginForm() {
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { turnstileToken, setTurnstileToken, userIp } = useTurnstile();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,14 +29,30 @@ export function LoginForm() {
       const isEmail = emailOrUsername.includes("@");
 
       const { data, error } = isEmail
-        ? await authClient.signIn.email({
-            email: emailOrUsername,
-            password,
-          })
-        : await authClient.signIn.username({
-            username: emailOrUsername,
-            password,
-          });
+        ? await authClient.signIn.email(
+            {
+              email: emailOrUsername,
+              password,
+            },
+            {
+              onRequest: (ctx) => {
+                ctx.headers.set("x-captcha-response", turnstileToken);
+                ctx.headers.set("x-captcha-user-remote-ip", userIp);
+              },
+            },
+          )
+        : await authClient.signIn.username(
+            {
+              username: emailOrUsername,
+              password,
+            },
+            {
+              onRequest: (ctx) => {
+                ctx.headers.set("x-captcha-response", turnstileToken);
+                ctx.headers.set("x-captcha-user-remote-ip", userIp);
+              },
+            },
+          );
 
       if (error) {
         let errorMessage = "Failed to sign in";
@@ -94,6 +113,14 @@ export function LoginForm() {
           </span>
         </ForgotPasswordForm>
       </div>
+      <Turnstile
+        refreshExpired="auto"
+        retry="auto"
+        siteKey={process.env.NEXT_PUBLIC_SITE_KEY!}
+        onVerify={(token) => {
+          setTurnstileToken(token);
+        }}
+      />
       <Button
         className="w-full mt-2 py-7 text-md"
         disabled={isLoading}

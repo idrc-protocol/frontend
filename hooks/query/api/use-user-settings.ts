@@ -94,12 +94,28 @@ export const useChangePassword = () => {
 
 export const useSendVerificationEmail = () => {
   return useMutation({
-    mutationFn: async (data: { email: string }) => {
+    mutationFn: async (data: {
+      email: string;
+      turnstileToken?: string;
+      userIp?: string;
+    }) => {
       const { data: result, error } =
-        await authClient.emailOtp.sendVerificationOtp({
-          email: data.email,
-          type: "email-verification",
-        });
+        await authClient.emailOtp.sendVerificationOtp(
+          {
+            email: data.email,
+            type: "email-verification",
+          },
+          {
+            onRequest: (ctx) => {
+              if (data.turnstileToken) {
+                ctx.headers.set("x-captcha-response", data.turnstileToken);
+              }
+              if (data.userIp) {
+                ctx.headers.set("x-captcha-user-remote-ip", data.userIp);
+              }
+            },
+          },
+        );
 
       if (error) {
         throw new Error(error.message || "Failed to send verification email");

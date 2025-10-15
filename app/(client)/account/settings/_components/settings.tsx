@@ -4,6 +4,7 @@ import { Camera, Check, Edit2, Key, Mail, User, X } from "lucide-react";
 import Image from "next/image";
 import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Turnstile } from "next-turnstile";
 
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +38,7 @@ import {
   useVerifyEmail,
 } from "@/hooks/query/api/use-user-settings";
 import { authClient } from "@/lib/auth-client";
+import { useTurnstile } from "@/hooks/captcha/use-turnstile";
 
 function SettingsSkeleton() {
   return (
@@ -162,6 +164,7 @@ function SettingsContent() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otpSent, setOtpSent] = useState(false);
+  const { turnstileToken, setTurnstileToken, userIp } = useTurnstile();
 
   const hasPassword = userSettings?.hasPassword || false;
   const isEmailVerified = userSettings?.emailVerified || false;
@@ -249,7 +252,11 @@ function SettingsContent() {
     }
 
     try {
-      await sendVerificationEmailMutation.mutateAsync({ email: user.email });
+      await sendVerificationEmailMutation.mutateAsync({
+        email: user.email,
+        turnstileToken,
+        userIp,
+      });
       toast.success("Verification code sent to your email!");
       setOtpSent(true);
     } catch (err: any) {
@@ -305,6 +312,12 @@ function SettingsContent() {
         const { data, error } = await authClient.forgetPassword({
           email: user.email,
           redirectTo: `${window.location.origin}/auth/reset-password`,
+          fetchOptions: {
+            headers: {
+              "x-captcha-response": turnstileToken,
+              "x-captcha-user-remote-ip": userIp,
+            },
+          },
         });
 
         if (error) {
@@ -780,6 +793,14 @@ function SettingsContent() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
             </div>
+            <Turnstile
+              refreshExpired="auto"
+              retry="auto"
+              siteKey={process.env.NEXT_PUBLIC_SITE_KEY!}
+              onVerify={(token) => {
+                setTurnstileToken(token);
+              }}
+            />
             <DialogFooter>
               <Button
                 disabled={changePasswordMutation.isPending}
