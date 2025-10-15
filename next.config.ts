@@ -110,7 +110,7 @@ const nextConfig: NextConfig = {
               "font-src 'self' https://fonts.gstatic.com https://widget.cloudinary.com",
               "img-src 'self' data: https: blob:",
               "connect-src 'self' https: wss:",
-              "frame-src 'self' https://accounts.google.com *.sumsub.com https://widget.cloudinary.com https://api.cloudinary.com https://upload-widget.cloudinary.com",
+              "frame-src 'self' https://accounts.google.com *.sumsub.com https://widget.cloudinary.com https://api.cloudinary.com https://upload-widget.cloudinary.com https://challenges.cloudflare.com",
               "form-action 'self'",
               "base-uri 'self'",
               "object-src 'none'",
