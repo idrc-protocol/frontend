@@ -105,7 +105,7 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: isDev ? '' : [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com https://widget.cloudinary.com https://upload-widget.cloudinary.com",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com https://widget.cloudinary.com https://upload-widget.cloudinary.com https://challenges.cloudflare.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://widget.cloudinary.com",
               "font-src 'self' https://fonts.gstatic.com https://widget.cloudinary.com",
               "img-src 'self' data: https: blob:",
