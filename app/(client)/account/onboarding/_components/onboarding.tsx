@@ -288,8 +288,8 @@ export default function Onboarding() {
                   <div className="flex justify-between text-sm">
                     <span>Minimum Purchase</span>
                     <div className="flex items-center gap-1">
-                      <span>100 USDC</span>
-                      <ButtonTooltip text="For bank wire or direct stablecoin transfer subscriptions, the minimum purchase is $100,000 USD." />
+                      <span>$100</span>
+                      <ButtonTooltip text="For bank wire or direct stablecoin transfer subscriptions, the minimum purchase is $100 USD." />
                     </div>
                   </div>
                 </div>
