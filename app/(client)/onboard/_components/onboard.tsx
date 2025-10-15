@@ -29,7 +29,7 @@ import OnboardSuccess from "./onboard-success";
 function OnboardSkeleton() {
   return (
     <div className="flex flex-col lg:flex-row w-full min-h-svh">
-      <div className="hidden lg:flex w-1/2 bg-primary flex-col justify-center items-center p-12">
+      <div className="hidden lg:flex w-1/2 bg-blue-700 flex-col justify-center items-center p-12">
         <div className="flex flex-col gap-8 w-full max-w-md">
           <Skeleton className="h-8 w-48 bg-white/20" />
           <div className="flex flex-col gap-6">
