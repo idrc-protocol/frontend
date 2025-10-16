@@ -1,4 +1,5 @@
 import { contractAddresses } from "@/lib/constants";
+import { getTokensForChain } from "@/lib/tokens";
 
 export const assetsInfo = [
   {
@@ -11,7 +12,7 @@ export const assetsInfo = [
     description:
       "IDRC is a digital stable token designed to represent Indonesian Rupiah Coin, providing a Shariah-compliant medium of exchange, unit of account, and store of value within digital and decentralized financial ecosystems. The token is identified by its display name IDRC, token name Indonesian Rupiah Coin, underlying name Indonesian Rupiah Coin, and is recognized by the symbol IDRC and ticker IDRC. Built to align with Islamic financial principles, IDRC emphasizes transparency, fairness, and ethical compliance while maintaining the stability and interoperability required for integration across centralized exchanges, decentralized finance (DeFi) platforms, and digital payment infrastructures. It enables secure, efficient, and compliant settlement for a wide variety of financial use cases, including domestic and cross-border payments, halal e-commerce, remittances, merchant services, and treasury operations, while also functioning as a compliant collateral asset in Shariah-based lending, staking, and liquidity pools. The design of IDRC highlights adherence to Shariah governance, scalability, and compatibility with emerging Web3 infrastructures, making it suitable for both institutional adoption and individual usage. Its presence supports applications across Islamic banking, fintech innovation, halal investment platforms, and digital trade, thereby positioning IDRC as a vital enabler of financial inclusion, economic empowerment, and innovation within Indonesia’s Islamic economy and global Shariah-compliant financial markets.",
     primaryMarket: {
-      price: "100",
+      price: "1",
       open: "118.73",
       high: "119.685",
       low: "112.51",
@@ -28,15 +29,15 @@ export const assetsInfo = [
       averageVolume: null,
       sharesMultiplier: "1",
     },
-    underlyingMarket: {
-      open: "118.73",
-      high: "119.685",
-      low: "112.51",
-      marketCap: "39458023443",
-      volume24h: "10571889",
-      averageVolume: "4405113",
-    },
-    supportedPaymentMethods: null,
+    supportedPaymentMethods: [
+      {
+        chainId: 84532,
+        network: "BASE SEPOLIA",
+        paymentMethod: "IDRX",
+        paymentMethodAddress: getTokensForChain(84532).IDRX.address,
+        paymentMethodDecimals: getTokensForChain(84532).IDRX.decimals,
+      },
+    ],
     minimumAmount: 1,
     supportedNetworks: [
       {
@@ -103,3 +104,5 @@ export const assetsInfo = [
     iconSrc: "/idrc-token.png",
   },
 ];
+
+export type AssetInfo = (typeof assetsInfo)[0];

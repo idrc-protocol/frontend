@@ -366,7 +366,7 @@ export function TradingPairChart({ symbol, className }: TradingPairChartProps) {
               : `${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 8 })} ${quote}`}
           </span>
           <span
-            className={`text-lg font-semibold ${
+            className={`text-md font-medium ${
               isPositive ? "text-green-600" : "text-red-600"
             }`}
           >

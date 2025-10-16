@@ -20,7 +20,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { assetsInfo } from "@/data/asset-info";
+import { AssetInfo, assetsInfo } from "@/data/asset-info";
 import { assetData } from "@/data/asset.data";
 import { networkData } from "@/data/network.data";
 import { useOnboardingStatus } from "@/hooks/query/api/use-onboarding-status";
@@ -33,77 +33,6 @@ import { formatNumber } from "@/lib/helper/number";
 import { encodeSvgDataUri } from "@/lib/utils";
 import { MultiStepTransactionDialog } from "@/components/dialog/multi-step-transaction-dialog";
 import { TradingPairChart } from "@/components/chart/trading-pair-chart";
-
-export type AssetTag = {
-  categoryLayer: string;
-  categorySlug: string;
-  categoryLabel: string;
-  tagSlug: string;
-  tagLabel: string;
-};
-
-export type SupportedNetwork = {
-  network: string;
-  chainId: number;
-  address: string;
-  decimals: number;
-};
-
-export type DividendInfo = {
-  dividendYield: string;
-  lastCashAmount: string;
-  lastPaymentDate: string;
-  payoutFrequency: string;
-  ticker: string;
-};
-
-export type MarketInfo = {
-  price?: string | null;
-  open?: string | null;
-  high?: string | null;
-  low?: string | null;
-  close?: string | null;
-  priceChange24h?: string | null;
-  priceChangePct24h?: string | null;
-  apy?: string | null;
-  fdv?: string | null;
-  marketCap?: string | null;
-  totalSupply?: string | null;
-  circulatingSupply?: string | null;
-  tvl?: string | null;
-  volume24h?: string | null;
-  averageVolume?: string | null;
-  sharesMultiplier?: string | null;
-};
-
-export type UnderlyingMarketInfo = {
-  open: string;
-  high: string;
-  low: string;
-  marketCap: string;
-  volume24h: string;
-  averageVolume: string;
-};
-
-export type AssetInfo = {
-  displayName: string;
-  tokenName: string;
-  underlyingName: string;
-  symbol: string;
-  ticker: string;
-  description: string;
-  primaryMarket: MarketInfo;
-  underlyingMarket: UnderlyingMarketInfo;
-  supportedPaymentMethods: string[] | null;
-  minimumAmount: number | null;
-  supportedNetworks: SupportedNetwork[];
-  integrationPartners: string[];
-  tags: AssetTag[];
-  topHoldings: string[];
-  dividend: DividendInfo;
-  createdAt: string;
-  iconSrc: string;
-};
 
 interface InfoRowProps {
   label: string;
@@ -499,7 +428,7 @@ export default function Asset({ symbol }: { symbol: string }) {
                       label="Price"
                       value={
                         assetInfo.primaryMarket.price
-                          ? `$${assetInfo.primaryMarket.price}`
+                          ? `${assetInfo.primaryMarket.price}`
                           : undefined
                       }
                     />
@@ -677,7 +606,9 @@ export default function Asset({ symbol }: { symbol: string }) {
                   {assetInfo.supportedPaymentMethods && (
                     <InfoRow
                       label="Payment Methods"
-                      value={assetInfo.supportedPaymentMethods.join(", ")}
+                      value={assetInfo.supportedPaymentMethods
+                        .map((method) => method.paymentMethod)
+                        .join(", ")}
                     />
                   )}
                 </div>
