@@ -42,7 +42,7 @@ jobs:
             echo ""
             
             # Step 1: Pull latest changes from Git (redirect stderr to stdout to avoid script_stop issues)
-            echo "[1/6] 📥 Pulling latest changes..."
+            echo "[1/7] 📥 Pulling latest changes..."
             git fetch origin 2>&1
             BEFORE_COMMIT=$(git rev-parse HEAD)
             git pull origin main 2>&1
@@ -56,19 +56,25 @@ jobs:
             echo ""
             
             # Step 2: Install dependencies
-            echo "[2/6] 📦 Installing dependencies..."
+            echo "[2/7] 📦 Installing dependencies..."
             pnpm install --frozen-lockfile
             echo "✓ Dependencies installed"
             echo ""
             
-            # Step 3: Build application
-            echo "[3/6] 🔨 Building application..."
+            # Step 3: Generate Prisma client
+            echo "[3/7] 🗃️  Generating Prisma client..."
+            pnpm prisma generate
+            echo "✓ Prisma client generated"
+            echo ""
+            
+            # Step 4: Build application
+            echo "[4/7] 🔨 Building application..."
             pnpm build
             echo "✓ Build completed successfully"
             echo ""
             
-            # Step 4: Reload PM2 (graceful reload for zero-downtime)
-            echo "[4/6] 🔄 Reloading PM2 application..."
+            # Step 5: Reload PM2 (graceful reload for zero-downtime)
+            echo "[5/7] 🔄 Reloading PM2 application..."
             
             # Check if process exists
             if pm2 describe idrc-frontend > /dev/null 2>&1; then
@@ -82,14 +88,14 @@ jobs:
             fi
             echo ""
             
-            # Step 5: Save PM2 process list
-            echo "[5/6] 💾 Saving PM2 configuration..."
+            # Step 6: Save PM2 process list
+            echo "[6/7] 💾 Saving PM2 configuration..."
             pm2 save --force
             echo "✓ PM2 configuration saved"
             echo ""
             
-            # Step 6: Verify deployment
-            echo "[6/6] ✅ Verifying deployment..."
+            # Step 7: Verify deployment
+            echo "[7/7] ✅ Verifying deployment..."
             sleep 3
             
             # Check PM2 status and show detailed info
