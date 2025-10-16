@@ -63,7 +63,41 @@ function WalletsSkeleton() {
         <Skeleton className="h-4 w-3/4" />
       </div>
 
-      <div className="flex flex-col">
+      <div className="md:hidden flex flex-col gap-4">
+        {[1, 2, 3].map((index) => (
+          <div key={index} className="border rounded-lg p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-6 w-16 rounded-full" />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-5 w-5 rounded-full" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t">
+              <div className="flex flex-col gap-1">
+                <Skeleton className="h-3 w-12" />
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-3 w-28" />
+                  <Skeleton className="h-3 w-3" />
+                </div>
+              </div>
+              <div className="flex flex-col items-end gap-1">
+                <Skeleton className="h-3 w-12" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2 border-t">
+              <Skeleton className="h-8 w-32" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="hidden md:flex flex-col">
         <div className="border-b pb-2 mb-4">
           <div className="flex items-center">
             <div className="flex-1">
@@ -199,112 +233,232 @@ export default function Wallets() {
           <p className="text-gray-500 mb-4">No wallets found</p>
         </div>
       ) : (
-        <table className="w-full text-black">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left text-sm font-normal pb-2">Wallet</th>
-              <th className="text-center text-sm font-normal pb-2">Network</th>
-              <th className="text-center text-sm font-normal pb-2">Status</th>
-              <th className="text-center text-sm font-normal pb-2">Added</th>
-              <th className="text-right text-sm font-normal pb-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
+        <>
+          <div className="md:hidden flex flex-col gap-4">
             {wallets.map((wallet) => {
               const { status, variant } = getWalletStatus();
               const canDelete = wallets.length > 1;
 
               return (
-                <tr key={wallet.id} className="border-b border-gray-100">
-                  <td className="py-3 flex flex-col gap-1">
+                <div
+                  key={wallet.id}
+                  className="border rounded-lg p-4 space-y-3 hover:bg-gray-50"
+                >
+                  <div className="flex items-center justify-between">
                     <span className="font-medium text-sm">
                       {wallet.chain.name} Wallet
                     </span>
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-xs text-gray-500">
-                        {formatAddress(wallet.address)}
-                      </p>
-                      <ButtonCopy
-                        className="text-gray-500"
-                        iconSize={4}
-                        text={wallet.address}
+                    <Badge variant={variant}>{status}</Badge>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5">
+                      <img
+                        alt={wallet.chain.name}
+                        className="w-full h-full rounded-full"
+                        src={encodeSvgDataUri(
+                          getChainImageForWallet(
+                            wallet.chain.chainId,
+                            wallet.chain.network,
+                          ),
+                        )}
                       />
                     </div>
-                  </td>
-                  <td className="py-3 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5">
-                        <img
-                          alt={wallet.chain.name}
-                          className="w-full h-full rounded-full"
-                          src={encodeSvgDataUri(
-                            getChainImageForWallet(
-                              wallet.chain.chainId,
-                              wallet.chain.network,
-                            ),
-                          )}
+                    <span className="text-sm">{wallet.chain.name}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <div className="flex flex-col gap-1">
+                      <p className="text-xs text-gray-500">Address</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-xs text-gray-700">
+                          {formatAddress(wallet.address)}
+                        </p>
+                        <ButtonCopy
+                          className="text-gray-500"
+                          iconSize={3}
+                          text={wallet.address}
                         />
                       </div>
-                      <span className="text-sm">{wallet.chain.name}</span>
                     </div>
-                  </td>
-                  <td className="py-3 text-center">
-                    <Badge variant={variant}>{status}</Badge>
-                  </td>
-                  <td className="py-3 text-center text-sm text-gray-500">
-                    {new Date(wallet.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="py-3">
-                    <div className="flex justify-end items-center gap-2">
-                      {canDelete ? (
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Trash2 className="text-red-600 w-5 h-5 cursor-pointer hover:text-red-800" />
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Wallet</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete this wallet?
-                                This action cannot be undone.
-                                <br />
-                                <strong>
-                                  {wallet.chain.name} Wallet:{" "}
-                                  {formatAddress(wallet.address)}
-                                </strong>
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                className="bg-red-600 hover:bg-red-700"
-                                onClick={() =>
-                                  handleDeleteWallet(
-                                    wallet.id,
-                                    `${wallet.chain.name} Wallet`,
-                                  )
-                                }
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      ) : (
-                        <div className="relative group">
-                          <Trash2 className="text-gray-400 w-5 h-5 cursor-not-allowed" />
-                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                            Cannot delete last wallet
-                          </div>
-                        </div>
-                      )}
+                    <div className="flex flex-col items-end gap-1">
+                      <p className="text-xs text-gray-500">Added</p>
+                      <p className="text-xs text-gray-700">
+                        {new Date(wallet.createdAt).toLocaleDateString()}
+                      </p>
                     </div>
-                  </td>
-                </tr>
+                  </div>
+
+                  <div className="flex justify-end pt-2 border-t">
+                    {canDelete ? (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                            size="sm"
+                            variant="ghost"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete Wallet
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Wallet</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete this wallet? This
+                              action cannot be undone.
+                              <br />
+                              <strong>
+                                {wallet.chain.name} Wallet:{" "}
+                                {formatAddress(wallet.address)}
+                              </strong>
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-red-600 hover:bg-red-700"
+                              onClick={() =>
+                                handleDeleteWallet(
+                                  wallet.id,
+                                  `${wallet.chain.name} Wallet`,
+                                )
+                              }
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    ) : (
+                      <Button
+                        disabled
+                        className="text-gray-400 cursor-not-allowed"
+                        size="sm"
+                        variant="ghost"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Cannot delete last wallet
+                      </Button>
+                    )}
+                  </div>
+                </div>
               );
             })}
-          </tbody>
-        </table>
+          </div>
+
+          <table className="hidden md:table w-full text-black">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left text-sm font-normal pb-2">Wallet</th>
+                <th className="text-center text-sm font-normal pb-2">
+                  Network
+                </th>
+                <th className="text-center text-sm font-normal pb-2">Status</th>
+                <th className="text-center text-sm font-normal pb-2">Added</th>
+                <th className="text-right text-sm font-normal pb-2">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {wallets.map((wallet) => {
+                const { status, variant } = getWalletStatus();
+                const canDelete = wallets.length > 1;
+
+                return (
+                  <tr key={wallet.id} className="border-b border-gray-100">
+                    <td className="py-3 flex flex-col gap-1">
+                      <span className="font-medium text-sm">
+                        {wallet.chain.name} Wallet
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-xs text-gray-500">
+                          {formatAddress(wallet.address)}
+                        </p>
+                        <ButtonCopy
+                          className="text-gray-500"
+                          iconSize={4}
+                          text={wallet.address}
+                        />
+                      </div>
+                    </td>
+                    <td className="py-3 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-5 h-5">
+                          <img
+                            alt={wallet.chain.name}
+                            className="w-full h-full rounded-full"
+                            src={encodeSvgDataUri(
+                              getChainImageForWallet(
+                                wallet.chain.chainId,
+                                wallet.chain.network,
+                              ),
+                            )}
+                          />
+                        </div>
+                        <span className="text-sm">{wallet.chain.name}</span>
+                      </div>
+                    </td>
+                    <td className="py-3 text-center">
+                      <Badge variant={variant}>{status}</Badge>
+                    </td>
+                    <td className="py-3 text-center text-sm text-gray-500">
+                      {new Date(wallet.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="py-3">
+                      <div className="flex justify-end items-center gap-2">
+                        {canDelete ? (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Trash2 className="text-red-600 w-5 h-5 cursor-pointer hover:text-red-800" />
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Delete Wallet
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete this wallet?
+                                  This action cannot be undone.
+                                  <br />
+                                  <strong>
+                                    {wallet.chain.name} Wallet:{" "}
+                                    {formatAddress(wallet.address)}
+                                  </strong>
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  className="bg-red-600 hover:bg-red-700"
+                                  onClick={() =>
+                                    handleDeleteWallet(
+                                      wallet.id,
+                                      `${wallet.chain.name} Wallet`,
+                                    )
+                                  }
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        ) : (
+                          <div className="relative group">
+                            <Trash2 className="text-gray-400 w-5 h-5 cursor-not-allowed" />
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                              Cannot delete last wallet
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </>
       )}
     </div>
   );
