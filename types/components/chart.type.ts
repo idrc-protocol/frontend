@@ -1,42 +1,6 @@
 import { UTCTimestamp } from "lightweight-charts";
 
-export interface AssetData {
-  symbol: string;
-  ticker: string;
-  assetName: string;
-  iconSrc: string;
-  tags: Array<{
-    categoryLayer: string;
-    categorySlug: string;
-    categoryLabel: string;
-    tagSlug: string;
-    tagLabel: string;
-  }>;
-  createdAt: number;
-  primaryMarket: {
-    symbol: string;
-    price: string;
-    priceChange24h: string;
-    priceChangePct24h: string;
-    priceHistory24h: Array<{
-      timestamp: number;
-      price: string;
-    }>;
-    totalHolders: number;
-    sharesMultiplier: string;
-  };
-  underlyingMarket: {
-    ticker: string;
-    name: string;
-    priceHigh52w: string;
-    priceLow52w: string;
-    volume: string;
-    averageVolume: string;
-    sharesOutstanding: string;
-    marketCap: string;
-  };
-  timestamp: number;
-}
+import { AssetData } from "@/data/asset.data";
 
 export interface StockChartProps {
   assetData?: AssetData;

@@ -10,7 +10,6 @@ export const generateChartPath = (
 ): { linePath: string; areaPath: string } => {
   if (!data.length) return { linePath: "", areaPath: "" };
 
-  // Check if data is array of objects or just numbers
   const isTimestampData = typeof data[0] === "object" && "timestamp" in data[0];
 
   const values = isTimestampData
@@ -24,7 +23,6 @@ export const generateChartPath = (
   let points: number[][];
 
   if (isTimestampData) {
-    // Use actual timestamps for X positioning
     const timestamps = (data as DataPoint[]).map((d) => d.timestamp);
     const minTime = Math.min(...timestamps);
     const maxTime = Math.max(...timestamps);
@@ -37,7 +35,6 @@ export const generateChartPath = (
       return [x, y];
     });
   } else {
-    // Fallback to evenly-spaced points
     const stepX = width / (data.length - 1);
 
     points = values.map((value, idx) => {
