@@ -38,10 +38,14 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET!,
   baseURL: process.env.BETTER_AUTH_URL!,
   plugins: [
-    captcha({
-      provider: "cloudflare-turnstile",
-      secretKey: process.env.TURNSTILE_SECRET_KEY!,
-    }),
+    ...(process.env.NODE_ENV === "production"
+      ? [
+          captcha({
+            provider: "cloudflare-turnstile",
+            secretKey: process.env.TURNSTILE_SECRET_KEY!,
+          }),
+        ]
+      : []),
     username(),
     emailOTP({
       async sendVerificationOTP({ email, otp, type }) {

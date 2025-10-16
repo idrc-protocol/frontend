@@ -289,9 +289,9 @@ export default function Overview() {
   return (
     <div className="flex flex-col py-5 gap-6">
       <div className="h-30">
-        <div className="px-10 relative bg-[#e0ecff] rounded-2xl items-center justify-between flex h-30 overflow-hidden">
+        <div className="px-5 sm:px-10 relative bg-[#e0ecff] rounded-2xl items-center justify-between flex h-30 overflow-hidden gap-4">
           <div className="z-10">
-            <span className="font-medium text-black text-xl">
+            <span className="font-semibold text-black text-sm sm:text-xl">
               Introducing IDRC Protocol
             </span>
             <p className="text-xs">
@@ -330,6 +330,7 @@ export default function Overview() {
                 decimals: 2,
                 thousandSeparator: ",",
                 prefix: "$",
+                compact: true,
               })}
             </span>
           </div>
@@ -363,6 +364,7 @@ export default function Overview() {
                   decimals: 2,
                   thousandSeparator: ",",
                   prefix: "$",
+                  compact: true,
                 })}
               </span>
             </div>
@@ -419,6 +421,7 @@ export default function Overview() {
                   {formatNumber(priceFeed?.idrToUsd || 0, {
                     decimals: 6,
                     thousandSeparator: ",",
+                    compact: true,
                   })}
                 </td>
 
@@ -428,6 +431,7 @@ export default function Overview() {
                       {formatNumber(idrxBalanceNumber, {
                         decimals: 2,
                         thousandSeparator: ",",
+                        compact: true,
                       })}
                     </span>
                     <span className="text-xs text-gray-500">
@@ -435,6 +439,7 @@ export default function Overview() {
                       {formatNumber(idrxUsdValue, {
                         decimals: 2,
                         thousandSeparator: ",",
+                        compact: true,
                       })}
                     </span>
                   </div>
@@ -462,6 +467,7 @@ export default function Overview() {
                   decimals: 2,
                   thousandSeparator: ",",
                   prefix: "$",
+                  compact: true,
                 })}
               </span>
             </div>
@@ -522,6 +528,7 @@ export default function Overview() {
                     {formatNumber(parseFloat(asset.primaryMarket.price), {
                       decimals: 2,
                       thousandSeparator: ",",
+                      compact: true,
                     })}
                   </td>
 
@@ -531,6 +538,7 @@ export default function Overview() {
                         {formatNumber(Number(idrcBalanceNumber) || 0, {
                           decimals: 2,
                           thousandSeparator: ",",
+                          compact: true,
                         })}
                       </span>
                       <span className="text-xs text-gray-500">
@@ -541,6 +549,7 @@ export default function Overview() {
                           {
                             decimals: 2,
                             thousandSeparator: ",",
+                            compact: true,
                           },
                         )}
                       </span>

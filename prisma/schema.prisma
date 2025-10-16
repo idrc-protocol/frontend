@@ -104,3 +104,20 @@ model PriceFeed {
   @@index([base, target])
   @@index([updatedAt])
 }
+
+model ChartData {
+  id        String   @id @default(cuid())
+  symbol    String
+  timeframe String
+  timestamp BigInt
+  open      Float
+  high      Float
+  low       Float
+  close     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([symbol, timeframe, timestamp])
+  @@index([symbol, timeframe])
+  @@index([updatedAt])
+}

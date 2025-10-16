@@ -5,10 +5,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Fuel } from "lucide-react";
 import { formatDate } from "date-fns/format";
+import { parseUnits } from "viem";
 
-import { StockChart } from "@/components/chart/stock-chart";
 import DialogBuy from "@/components/dialog/dialog-buy";
-import DialogSell from "@/components/dialog/dialog-sell";
 import FallbackImage from "@/components/fallback-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,10 +25,14 @@ import { assetData } from "@/data/asset.data";
 import { networkData } from "@/data/network.data";
 import { useOnboardingStatus } from "@/hooks/query/api/use-onboarding-status";
 import { useBalanceCustom } from "@/hooks/query/contract/use-balance-custom";
+import { useRedeem } from "@/hooks/mutation/contract/use-redeem";
+import { contractAddresses } from "@/lib/constants";
 import { useSession } from "@/lib/auth-client";
 import { FALLBACK_IMAGE } from "@/lib/constants";
 import { formatNumber } from "@/lib/helper/number";
 import { encodeSvgDataUri } from "@/lib/utils";
+import { MultiStepTransactionDialog } from "@/components/dialog/multi-step-transaction-dialog";
+import { TradingPairChart } from "@/components/chart/trading-pair-chart";
 
 export type AssetTag = {
   categoryLayer: string;
@@ -244,14 +247,15 @@ export default function Asset({ symbol }: { symbol: string }) {
     tokenIDRC: true,
   });
 
+  const redeem = useRedeem();
   const [dialogBuyOpen, setDialogBuyOpen] = useState(false);
-  const [dialogSellOpen, setDialogSellOpen] = useState(false);
   const [buyAmount, setBuyAmount] = useState("");
   const [sellAmount, setSellAmount] = useState("");
   const [selectedAction, setSelectedAction] = useState<"buy" | "sell" | null>(
     null,
   );
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [showTransactionDialog, setShowTransactionDialog] = useState(false);
 
   const handleNumberInput = (value: string): string => {
     const numericValue = value.replace(/[^0-9.]/g, "");
@@ -316,12 +320,23 @@ export default function Asset({ symbol }: { symbol: string }) {
     setDialogBuyOpen(false);
   };
 
-  const handleOpenDialogSell = () => {
-    setDialogSellOpen(true);
+  const handleSell = () => {
+    if (!sellAmount || Number(sellAmount) <= 0) return;
+
+    const amountInWei = parseUnits(sellAmount, 18);
+
+    setShowTransactionDialog(true);
+
+    redeem.mutation.mutate({
+      token: contractAddresses.IDRCProxy,
+      spender: contractAddresses.HubProxy,
+      amount: amountInWei,
+    });
   };
 
-  const handleCloseDialogSell = () => {
-    setDialogSellOpen(false);
+  const handleCloseTransactionDialog = () => {
+    setShowTransactionDialog(false);
+    redeem.resetSteps();
   };
 
   const handleVerifyClick = () => {
@@ -427,18 +442,26 @@ export default function Asset({ symbol }: { symbol: string }) {
         onClose={handleCloseDialogBuy}
         onOpenChange={setDialogBuyOpen}
       />
-      <DialogSell
-        assetInfo={assetInfo}
-        calculatedCurrentAmount={calculatedCurrentAmount}
-        open={dialogSellOpen}
-        sellAmount={sellAmount}
-        onClose={handleCloseDialogSell}
-        onOpenChange={setDialogSellOpen}
+
+      <MultiStepTransactionDialog
+        currentStep={redeem.currentStep}
+        description={`Selling ${formatNumber(sellAmount, { decimals: 0, thousandSeparator: "," })} ${assetInfo?.symbol} for IDRX`}
+        explorerUrl="https://sepolia.basescan.org/tx"
+        isError={redeem.isError}
+        isLoading={redeem.isLoading}
+        isSuccess={redeem.isSuccess}
+        open={showTransactionDialog}
+        showTxHashes={true}
+        steps={redeem.steps}
+        title="Sell Transaction"
+        onClose={handleCloseTransactionDialog}
+        onOpenChange={setShowTransactionDialog}
+        onRetry={() => handleSell()}
       />
 
       <div className="w-full h-full pb-24 lg:pb-10 min-h-svh">
         <div className="flex flex-col lg:flex-row items-start gap-6 mt-5 relative">
-          <div className="flex-1 flex flex-col gap-6">
+          <div className="w-full lg:flex-1 lg:min-w-0 flex flex-col gap-6">
             <div className="flex items-center gap-3">
               <FallbackImage
                 alt={asset.assetName}
@@ -456,12 +479,10 @@ export default function Asset({ symbol }: { symbol: string }) {
               </div>
             </div>
 
-            <div className="w-full max-w-full min-w-0 overflow-hidden">
-              <StockChart
-                allowedTimeframes={["1W", "1M", "1Y", "ALL"]}
-                className="h-full w-full max-w-full"
-                showCurrentPrice={true}
-                styleChart={{ minHeight: "430px", maxWidth: "100%" }}
+            <div className="w-full lg:min-w-0">
+              <TradingPairChart
+                className="w-full"
+                symbol={`${asset.chart.compareSymbol}/${asset.chart.compareCurrency}`}
               />
             </div>
 
@@ -925,7 +946,7 @@ export default function Asset({ symbol }: { symbol: string }) {
                   if (selectedAction === "buy") {
                     handleOpenDialogBuy();
                   } else if (selectedAction === "sell") {
-                    handleOpenDialogSell();
+                    handleSell();
                   }
                 }}
               >
@@ -1220,7 +1241,7 @@ export default function Asset({ symbol }: { symbol: string }) {
                           if (selectedAction === "buy") {
                             handleOpenDialogBuy();
                           } else if (selectedAction === "sell") {
-                            handleOpenDialogSell();
+                            handleSell();
                           }
                           setIsSheetOpen(false);
                         }}

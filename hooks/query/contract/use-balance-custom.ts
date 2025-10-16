@@ -1,5 +1,5 @@
-import { useAccount, useBalance } from "wagmi";
-import { isAddress } from "viem";
+import { useAccount, useReadContract } from "wagmi";
+import { erc20Abi, isAddress } from "viem";
 
 import { normalize } from "@/lib/helper/bignumber";
 import { contractAddresses } from "@/lib/constants";
@@ -13,14 +13,12 @@ export const useBalanceCustom = ({
   tokenAddress,
   enabled = true,
   refetchInterval = 10_000,
-  _decimals = 6,
   tokenIDRC,
   tokenIDRX,
 }: {
   tokenAddress?: HexAddress;
   enabled?: boolean;
   refetchInterval?: number;
-  _decimals?: number;
   tokenIDRC?: boolean;
   tokenIDRX?: boolean;
 }) => {
@@ -40,21 +38,35 @@ export const useBalanceCustom = ({
 
   const isTokenValid = isAddress(tokenAddress);
 
-  const { data, isLoading, refetch } = useBalance({
-    address: userAddress,
-    token: tokenAddress,
+  const {
+    data: value,
+    isLoading,
+    refetch,
+  } = useReadContract({
+    address: tokenAddress as HexAddress,
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: [userAddress as HexAddress],
     query: {
       enabled: enabled && !!userAddress && isConnected && isTokenValid,
       refetchInterval,
     },
   });
 
-  const balance = data?.value || BigInt(0);
-  const decimals = data?.decimals ?? _decimals ?? 6;
+  const { data: decimals } = useReadContract({
+    address: tokenAddress as HexAddress,
+    abi: erc20Abi,
+    functionName: "decimals",
+    query: {
+      enabled: enabled && !!userAddress && isConnected && isTokenValid,
+      refetchInterval,
+    },
+  });
 
-  const balanceNormalized = data?.value
-    ? normalize(Number(data.value), decimals) || 0
-    : 0;
+  const balance = value || BigInt(0);
+
+  const balanceNormalized =
+    value && decimals ? normalize(Number(value), decimals) || 0 : 0;
 
   return {
     balance,
