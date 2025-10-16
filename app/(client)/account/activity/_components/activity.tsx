@@ -228,7 +228,6 @@ export default function Activity() {
               <>
                 <div className="md:hidden flex flex-col gap-4">
                   {transactions.map((tx) => {
-                    const amount = Number(tx.amount) / 1e18;
                     const shares = Number(tx.shares) / 1e18;
                     const date = new Date(Number(tx.blockTimestamp) * 1000);
                     const shortHash = `${tx.transactionHash.slice(0, 6)}...${tx.transactionHash.slice(-4)}`;
@@ -265,16 +264,7 @@ export default function Activity() {
                         </div>
 
                         <div className="grid grid-cols-2 gap-3 text-sm">
-                          <div>
-                            <p className="text-gray-500 text-xs">Amount</p>
-                            <p className="font-medium">
-                              {formatNumber(amount, {
-                                decimals: 2,
-                                thousandSeparator: ",",
-                              })}
-                            </p>
-                          </div>
-                          <div className="flex items-end flex-col">
+                          <div className="flex items-start flex-col">
                             <p className="text-gray-500 text-xs">Shares</p>
                             <p className="font-medium">
                               {formatNumber(shares, {
@@ -321,9 +311,6 @@ export default function Activity() {
                           Network
                         </th>
                         <th className="text-right text-sm font-normal pb-2 px-2">
-                          Amount
-                        </th>
-                        <th className="text-right text-sm font-normal pb-2 px-2">
                           Shares
                         </th>
                         <th className="text-center text-sm font-normal pb-2 px-2">
@@ -337,7 +324,6 @@ export default function Activity() {
 
                     <tbody>
                       {transactions.map((tx) => {
-                        const amount = Number(tx.amount) / 1e18;
                         const shares = Number(tx.shares) / 1e18;
                         const date = new Date(Number(tx.blockTimestamp) * 1000);
                         const shortHash = `${tx.transactionHash.slice(0, 6)}...${tx.transactionHash.slice(-4)}`;
@@ -381,13 +367,6 @@ export default function Activity() {
                                 src="/images/chains/base.webp"
                                 width={200}
                               />
-                            </td>
-
-                            <td className="py-3 px-2 text-sm font-medium text-right whitespace-nowrap">
-                              {formatNumber(amount, {
-                                decimals: 2,
-                                thousandSeparator: ",",
-                              })}
                             </td>
 
                             <td className="py-3 px-2 text-sm font-medium text-right whitespace-nowrap">
