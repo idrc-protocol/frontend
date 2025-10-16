@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 interface ChartDataPoint {
   timestamp: number;
@@ -8,7 +8,7 @@ interface ChartDataPoint {
   close: number;
 }
 
-interface ChartDataResponse {
+export interface ChartDataResponse {
   success: boolean;
   data?: {
     symbol: string;
@@ -21,42 +21,31 @@ interface ChartDataResponse {
   error?: string;
 }
 
+const fetchChartData = async (symbol: string, timeframe: string) => {
+  const response = await fetch(
+    `/api/chart-data?symbol=${encodeURIComponent(symbol)}&timeframe=${timeframe}`,
+  );
+  const result: ChartDataResponse = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.error || "Failed to fetch chart data");
+  }
+
+  return result.data;
+};
+
 export function useChartData(symbol: string, timeframe: string) {
-  const [data, setData] = useState<ChartDataPoint[]>([]);
-  const [currentPrice, setCurrentPrice] = useState<number>(0);
-  const [priceChange24h, setPriceChange24h] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["chartData", symbol, timeframe],
+    queryFn: () => fetchChartData(symbol, timeframe),
+    enabled: !!symbol,
+  });
 
-  useEffect(() => {
-    if (!symbol) return;
-
-    const fetchChartData = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const response = await fetch(
-          `/api/chart-data?symbol=${encodeURIComponent(symbol)}&timeframe=${timeframe}`,
-        );
-        const result: ChartDataResponse = await response.json();
-
-        if (result.success && result.data) {
-          setData(result.data.chartData);
-          setCurrentPrice(result.data.currentPrice);
-          setPriceChange24h(result.data.priceChange24h);
-        } else {
-          setError(result.error || "Failed to fetch chart data");
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchChartData();
-  }, [symbol, timeframe]);
-
-  return { data, currentPrice, priceChange24h, loading, error };
+  return {
+    data: data?.chartData ?? [],
+    currentPrice: data?.currentPrice ?? 0,
+    priceChange24h: data?.priceChange24h ?? 0,
+    loading: isLoading,
+    error: error instanceof Error ? error.message : null,
+  };
 }

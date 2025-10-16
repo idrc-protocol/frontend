@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
+import BigNumber from "bignumber.js";
 
 import { prisma } from "@/lib/prisma";
+
+BigNumber.config({ DECIMAL_PLACES: 50, ROUNDING_MODE: BigNumber.ROUND_DOWN });
 
 export async function GET(request: Request) {
   try {
@@ -62,33 +65,41 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => ({}));
     const base = body.base || "USD";
     const target = body.target || "IDR";
+    const symbol = body.symbol || "IDRX/USD";
 
-    const frankfurterUrl = `https://api.frankfurter.app/latest?from=${base}&to=${target}`;
-    const response = await fetch(frankfurterUrl);
+    const url = new URL(request.url);
+    const chartDataUrl = `${url.origin}/api/chart-data?symbol=${encodeURIComponent(symbol)}&timeframe=1D`;
 
-    if (!response.ok) {
+    const chartResponse = await fetch(chartDataUrl);
+
+    if (!chartResponse.ok) {
       return NextResponse.json(
         {
           success: false,
-          error: "Failed to fetch rates from Frankfurter API",
+          error: `No chart data found for ${symbol}. Please run POST /api/chart-data first.`,
+        },
+        { status: 404 },
+      );
+    }
+
+    const chartData = await chartResponse.json();
+
+    if (!chartData.success || !chartData.data) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: chartData.error || "Failed to get chart data",
         },
         { status: 500 },
       );
     }
 
-    const data = await response.json();
+    const latestPriceBN = new BigNumber(chartData.data.currentPrice);
+    const latestPrice = latestPriceBN.toNumber();
 
-    const rate = data.rates[target];
-
-    if (!rate) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: `Rate for ${target} not found in API response`,
-        },
-        { status: 500 },
-      );
-    }
+    const rateBN = new BigNumber(1).dividedBy(latestPriceBN);
+    const rate = rateBN.toNumber();
+    const currentDate = new Date().toISOString().split("T")[0];
 
     const priceFeed = await prisma.priceFeed.upsert({
       where: {
@@ -99,21 +110,21 @@ export async function POST(request: Request) {
       },
       update: {
         rate: rate,
-        date: data.date,
-        amount: data.amount,
+        date: currentDate,
+        amount: 1,
         updatedAt: new Date(),
       },
       create: {
         base: base,
         target: target,
         rate: rate,
-        date: data.date,
-        amount: data.amount,
+        date: currentDate,
+        amount: 1,
       },
     });
 
     const usdToIdr = priceFeed.rate;
-    const idrToUsd = 1 / priceFeed.rate;
+    const idrToUsd = latestPrice;
 
     return NextResponse.json({
       success: true,
@@ -131,9 +142,11 @@ export async function POST(request: Request) {
         createdAt: priceFeed.createdAt,
       },
       source: {
-        api: "Frankfurter",
-        url: frankfurterUrl,
-        rawData: data,
+        api: "Chart Data API",
+        symbol: symbol,
+        currentPrice: latestPrice,
+        priceChange24h: chartData.data.priceChange24h,
+        priceChangePct24h: chartData.data.priceChangePct24h,
       },
     });
   } catch (error) {

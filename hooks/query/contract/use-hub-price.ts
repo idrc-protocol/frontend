@@ -2,6 +2,7 @@ import { useReadContract } from "wagmi";
 
 import { contractAddresses } from "@/lib/constants";
 import { hubABI } from "@/lib/abis/hub.abi";
+import { normalize } from "@/lib/helper/bignumber";
 
 export const useHubPrice = () => {
   const { data: price, ...rest } = useReadContract({
@@ -27,8 +28,24 @@ export const calculateIdrxAmount = (
 
   if (isNaN(assetNum) || assetNum === 0) return 0;
 
-  const pricePerIdrc = Number(price) / 100;
-  const idrxAmount = assetNum * pricePerIdrc;
+  const idrxAmount = (assetNum * Number(price)) / 100;
 
   return idrxAmount;
+};
+
+export const calculateIdrcAmount = (
+  idrcAmount: string | number,
+  price: bigint | undefined,
+): number => {
+  if (!price || !idrcAmount) return 0;
+
+  const idrcNum =
+    typeof idrcAmount === "string" ? parseFloat(idrcAmount) : idrcAmount;
+
+  if (isNaN(idrcNum) || idrcNum === 0) return 0;
+
+  const pricePerIdrc = Number(normalize(Number(price), 18));
+  const assetAmount = idrcNum / pricePerIdrc;
+
+  return assetAmount;
 };

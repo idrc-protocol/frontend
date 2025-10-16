@@ -5,20 +5,19 @@ import { Loader2, Wallet as WalletIcon } from "lucide-react";
 import { parseUnits } from "viem";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 
-import { AssetInfo } from "@/app/(client)/assets/[slug]/_components/asset";
 import { formatNumber } from "@/lib/helper/number";
 import { usePriceFeed } from "@/hooks/query/api/use-price-feed";
 import { useBalanceCustom } from "@/hooks/query/contract/use-balance-custom";
 import { useRedeem } from "@/hooks/mutation/contract/use-redeem";
 import { MultiStepTransactionDialog } from "@/components/dialog/multi-step-transaction-dialog";
 import { contractAddresses } from "@/lib/constants";
-import { BASE_SEPOLIA_TOKENS } from "@/lib/tokens";
 import {
   useHubPrice,
   calculateIdrxAmount,
 } from "@/hooks/query/contract/use-hub-price";
 import { useWallets } from "@/hooks/query/api/use-wallets";
 import { useSession } from "@/lib/auth-client";
+import { AssetInfo } from "@/data/asset-info";
 
 import { Button } from "../ui/button";
 import {
@@ -110,12 +109,9 @@ export default function DialogSell({
   };
 
   const handleConfirmSell = () => {
-    if (!idrxAmountToReceive || !userAddress) return;
+    if (!sellAmount || !userAddress) return;
 
-    const amountInWei = parseUnits(
-      idrxAmountToReceive.toString(),
-      BASE_SEPOLIA_TOKENS.IDRX.decimals,
-    );
+    const sharesInWei = parseUnits(sellAmount, 18);
 
     setShowTransactionDialog(true);
     onOpenChange(false);
@@ -123,7 +119,7 @@ export default function DialogSell({
     redeem.mutation.mutate({
       token: contractAddresses.IDRXToken,
       spender: contractAddresses.HubProxy,
-      amount: amountInWei,
+      amount: sharesInWei,
     });
   };
 

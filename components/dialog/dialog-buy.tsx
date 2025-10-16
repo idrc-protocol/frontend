@@ -5,9 +5,7 @@ import { Loader2, Wallet as WalletIcon } from "lucide-react";
 import { parseUnits } from "viem";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 
-import { AssetInfo } from "@/app/(client)/assets/[slug]/_components/asset";
 import { formatNumber } from "@/lib/helper/number";
-import { usePriceFeed } from "@/hooks/query/api/use-price-feed";
 import { useBalanceCustom } from "@/hooks/query/contract/use-balance-custom";
 import { useSubscription } from "@/hooks/mutation/contract/use-subscription";
 import { MultiStepTransactionDialog } from "@/components/dialog/multi-step-transaction-dialog";
@@ -19,6 +17,7 @@ import {
 } from "@/hooks/query/contract/use-hub-price";
 import { useWallets } from "@/hooks/query/api/use-wallets";
 import { useSession } from "@/lib/auth-client";
+import { AssetInfo } from "@/data/asset-info";
 
 import { Button } from "../ui/button";
 import {
@@ -82,10 +81,6 @@ export default function DialogBuy({
     isConnected &&
     registeredWallet &&
     userAddress?.toLowerCase() !== registeredWallet.address.toLowerCase();
-
-  const { data: priceFeed } = usePriceFeed({
-    amountFromUsd: Number(calculatedCurrentAmount),
-  });
 
   const {
     price: hubPrice,
@@ -155,13 +150,8 @@ export default function DialogBuy({
               </DialogTitle>
               <DialogDescription>
                 <span className="font-medium text-sm">
-                  1 {assetInfo?.symbol} ≈ {assetInfo?.primaryMarket.price} USD ≈{" "}
-                  {formatNumber(
-                    (priceFeed?.usdToIdr || 0) *
-                      (Number(assetInfo?.primaryMarket.price) || 0),
-                    { decimals: 0, thousandSeparator: "," },
-                  )}{" "}
-                  IDRX
+                  1 {assetInfo?.symbol} ≈ {assetInfo?.primaryMarket.price} USD ≈
+                  1 IDRX
                 </span>
               </DialogDescription>
             </DialogHeader>

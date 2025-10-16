@@ -32,7 +32,11 @@ import { FALLBACK_IMAGE } from "@/lib/constants";
 import { formatNumber } from "@/lib/helper/number";
 import { encodeSvgDataUri } from "@/lib/utils";
 import { MultiStepTransactionDialog } from "@/components/dialog/multi-step-transaction-dialog";
-import { TradingPairChart } from "@/components/chart/trading-pair-chart";
+import {
+  Timeframe,
+  TradingPairChart,
+} from "@/components/chart/trading-pair-chart";
+import { useChartData } from "@/hooks/use-chart-data";
 
 interface InfoRowProps {
   label: string;
@@ -206,6 +210,16 @@ export default function Asset({ symbol }: { symbol: string }) {
     return numericValue;
   };
 
+  const formatInputDisplay = (value: string): string => {
+    if (!value) return "";
+
+    const parts = value.split(".");
+
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    return parts.join(".");
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const allowedKeys = [
       "Backspace",
@@ -241,6 +255,12 @@ export default function Asset({ symbol }: { symbol: string }) {
     (a) => a.symbol === symbol,
   );
 
+  const [timeframe, setTimeframe] = useState<Timeframe>("1D");
+  const chartSymbol = asset?.chart
+    ? `${asset.chart.compareSymbol}/${asset.chart.compareCurrency}`
+    : symbol;
+  const chartDatas = useChartData(chartSymbol, timeframe);
+
   const handleOpenDialogBuy = () => {
     setDialogBuyOpen(true);
   };
@@ -257,7 +277,7 @@ export default function Asset({ symbol }: { symbol: string }) {
     setShowTransactionDialog(true);
 
     redeem.mutation.mutate({
-      token: contractAddresses.IDRCProxy,
+      token: contractAddresses.IDRXToken,
       spender: contractAddresses.HubProxy,
       amount: amountInWei,
     });
@@ -358,7 +378,7 @@ export default function Asset({ symbol }: { symbol: string }) {
 
   const calculatedCurrentAmount = String(
     parseFloat(currentAmount) *
-      parseFloat(assetInfo?.primaryMarket.price || "1"),
+      parseFloat(String(chartDatas.currentPrice || "0")),
   );
 
   return (
@@ -410,8 +430,11 @@ export default function Asset({ symbol }: { symbol: string }) {
 
             <div className="w-full lg:min-w-0">
               <TradingPairChart
+                chartDatas={chartDatas}
                 className="w-full"
-                symbol={`${asset.chart.compareSymbol}/${asset.chart.compareCurrency}`}
+                setTimeframe={setTimeframe}
+                symbol={`${asset.symbol}/${asset.chart.compareCurrency}`}
+                timeframe={timeframe}
               />
             </div>
 
@@ -427,8 +450,10 @@ export default function Asset({ symbol }: { symbol: string }) {
                     <InfoRow
                       label="Price"
                       value={
-                        assetInfo.primaryMarket.price
-                          ? `${assetInfo.primaryMarket.price}`
+                        chartDatas.currentPrice
+                          ? `$${formatNumber(chartDatas.currentPrice, {
+                              decimals: 8,
+                            })}`
                           : undefined
                       }
                     />
@@ -597,7 +622,7 @@ export default function Asset({ symbol }: { symbol: string }) {
                   <InfoRow label="Ticker" value={assetInfo.ticker} />
                   <InfoRow
                     label="Minimum Amount"
-                    value={`${assetInfo.minimumAmount} ${assetInfo.symbol}`}
+                    value={`${formatNumber(assetInfo.minimumAmount, { decimals: 0, thousandSeparator: "," })} ${assetInfo.symbol}`}
                   />
                   <InfoRow
                     label="Created"
@@ -646,7 +671,9 @@ export default function Asset({ symbol }: { symbol: string }) {
                       : "Complete verification"
                   }
                   type="text"
-                  value={selectedAction === "sell" ? sellAmount : buyAmount}
+                  value={formatInputDisplay(
+                    selectedAction === "sell" ? sellAmount : buyAmount,
+                  )}
                   onChange={(e) => {
                     const numericValue = handleNumberInput(e.target.value);
 
@@ -706,7 +733,7 @@ export default function Asset({ symbol }: { symbol: string }) {
 
                           setSellAmount(balance.toString());
                         } else {
-                          setBuyAmount("10000");
+                          setBuyAmount("1000000000");
                         }
                       }}
                     >
@@ -772,7 +799,9 @@ export default function Asset({ symbol }: { symbol: string }) {
                 <div className="flex items-center justify-between text-sm">
                   <span>Price per Share</span>
                   <span className="font-medium">
-                    ${assetInfo?.primaryMarket.price || "0.00"}
+                    $
+                    {formatNumber(chartDatas.currentPrice, { decimals: 8 }) ||
+                      "0.00"}
                   </span>
                 </div>
 
@@ -795,7 +824,11 @@ export default function Asset({ symbol }: { symbol: string }) {
                 <div className="flex items-center justify-between text-sm">
                   <span>Minimum Amount</span>
                   <span className="font-medium">
-                    {assetInfo?.minimumAmount || "N/A"} {assetInfo?.symbol}
+                    {formatNumber(assetInfo?.minimumAmount || 0, {
+                      decimals: 0,
+                      thousandSeparator: ",",
+                    }) || "N/A"}{" "}
+                    {assetInfo?.symbol}
                   </span>
                 </div>
 
@@ -821,7 +854,7 @@ export default function Asset({ symbol }: { symbol: string }) {
                               (
                                 parseFloat(currentAmount) *
                                 parseFloat(
-                                  assetInfo?.primaryMarket.price || "1",
+                                  String(chartDatas.currentPrice) || "1",
                                 )
                               ).toFixed(2),
                               { decimals: 0, thousandSeparator: "," },
@@ -954,9 +987,9 @@ export default function Asset({ symbol }: { symbol: string }) {
                           pattern="[0-9]*"
                           placeholder="0.00"
                           type="text"
-                          value={
-                            selectedAction === "sell" ? sellAmount : buyAmount
-                          }
+                          value={formatInputDisplay(
+                            selectedAction === "sell" ? sellAmount : buyAmount,
+                          )}
                           onChange={(e) => {
                             const numericValue = handleNumberInput(
                               e.target.value,
@@ -1020,7 +1053,7 @@ export default function Asset({ symbol }: { symbol: string }) {
 
                                   setSellAmount(balance.toString());
                                 } else {
-                                  setBuyAmount("10000");
+                                  setBuyAmount("1000000000");
                                 }
                               }}
                             >
@@ -1067,7 +1100,10 @@ export default function Asset({ symbol }: { symbol: string }) {
                         <div className="flex items-center justify-between text-sm">
                           <span>Price per Share</span>
                           <span className="font-medium">
-                            ${assetInfo?.primaryMarket.price || "0.00"}
+                            $
+                            {formatNumber(chartDatas.currentPrice, {
+                              decimals: 8,
+                            }) || "0.00"}
                           </span>
                         </div>
 
@@ -1092,7 +1128,10 @@ export default function Asset({ symbol }: { symbol: string }) {
                         <div className="flex items-center justify-between text-sm">
                           <span>Minimum Amount</span>
                           <span className="font-medium">
-                            {assetInfo?.minimumAmount || "N/A"}{" "}
+                            {formatNumber(assetInfo?.minimumAmount || 0, {
+                              decimals: 0,
+                              thousandSeparator: ",",
+                            }) || "N/A"}{" "}
                             {assetInfo?.symbol}
                           </span>
                         </div>

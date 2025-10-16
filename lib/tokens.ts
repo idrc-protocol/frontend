@@ -13,7 +13,7 @@ export const BASE_SEPOLIA_TOKENS: Record<string, TokenConfig> = {
   IDRX: {
     symbol: "IDRX",
     name: "IDRX",
-    address: "0x109286e38da908A7Db711c6Ff725ae7C38528856" as Address,
+    address: "0xFa864402D346F16463932891Bb854A898b645ef1" as Address,
     decimals: 2,
     icon: "/images/token/idrx.webp",
     coingeckoId: "idrx",

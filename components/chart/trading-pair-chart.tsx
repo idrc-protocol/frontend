@@ -3,26 +3,39 @@
 import type { IChartApi, ISeriesApi } from "lightweight-charts";
 
 import { AreaSeries } from "lightweight-charts";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 
-import { useChartData } from "@/hooks/use-chart-data";
+const TIMEFRAMES = ["1D", "1W", "1M", "3M", "1Y", "ALL"] as const;
+
+export type Timeframe = (typeof TIMEFRAMES)[number];
 
 interface TradingPairChartProps {
   symbol: string;
   className?: string;
+  timeframe: Timeframe;
+  setTimeframe: (tf: Timeframe) => void;
+  chartDatas: {
+    data: {
+      timestamp: number;
+      open: number;
+      high: number;
+      low: number;
+      close: number;
+    }[];
+    currentPrice: number;
+    priceChange24h: number;
+    loading: boolean;
+    error: string | null;
+  };
 }
 
-const TIMEFRAMES = ["1D", "1W", "1M", "3M", "1Y", "ALL"] as const;
-
-type Timeframe = (typeof TIMEFRAMES)[number];
-
-export function TradingPairChart({ symbol, className }: TradingPairChartProps) {
-  const [timeframe, setTimeframe] = useState<Timeframe>("1D");
-  const { data, currentPrice, priceChange24h, loading, error } = useChartData(
-    symbol,
-    timeframe,
-  );
-
+export function TradingPairChart({
+  symbol,
+  className,
+  timeframe,
+  setTimeframe,
+  chartDatas,
+}: TradingPairChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -44,8 +57,10 @@ export function TradingPairChart({ symbol, className }: TradingPairChartProps) {
 
   const [base, quote] = symbol.split("/");
   const priceChangePercent =
-    currentPrice !== 0 ? (priceChange24h / currentPrice) * 100 : 0;
-  const isPositive = priceChange24h >= 0;
+    chartDatas.currentPrice !== 0
+      ? (chartDatas.priceChange24h / chartDatas.currentPrice) * 100
+      : 0;
+  const isPositive = chartDatas.priceChange24h >= 0;
 
   useEffect(() => {
     let chartInstance: IChartApi | null = null;
@@ -131,8 +146,8 @@ export function TradingPairChart({ symbol, className }: TradingPairChartProps) {
         seriesRef.current = areaSeries;
         chartRef.current = chartInstance;
 
-        if (data.length > 0) {
-          const chartData = data.map((item) => ({
+        if (chartDatas.data.length > 0) {
+          const chartData = chartDatas.data.map((item) => ({
             time: Math.floor(item.timestamp / 1000) as any,
             value: item.close,
           }));
@@ -298,19 +313,19 @@ export function TradingPairChart({ symbol, className }: TradingPairChartProps) {
       chartRef.current = null;
       seriesRef.current = null;
     };
-  }, [isPositive, data]);
+  }, [isPositive, chartDatas.data]);
 
   useEffect(() => {
     if (
       !seriesRef.current ||
       !chartRef.current ||
       isDisposedRef.current ||
-      data.length === 0
+      chartDatas.data.length === 0
     )
       return;
 
     try {
-      const chartData = data.map((item) => ({
+      const chartData = chartDatas.data.map((item) => ({
         time: Math.floor(item.timestamp / 1000) as any,
         value: item.close,
       }));
@@ -331,9 +346,9 @@ export function TradingPairChart({ symbol, className }: TradingPairChartProps) {
     } catch (error) {
       throw error;
     }
-  }, [data]);
+  }, [chartDatas.data]);
 
-  if (loading) {
+  if (chartDatas.loading) {
     return (
       <div className="flex items-center justify-center min-h-[500px] bg-white rounded-lg">
         <div className="text-gray-500">Loading chart data...</div>
@@ -341,10 +356,10 @@ export function TradingPairChart({ symbol, className }: TradingPairChartProps) {
     );
   }
 
-  if (error) {
+  if (chartDatas.error) {
     return (
       <div className="flex items-center justify-center min-h-[500px] bg-white rounded-lg">
-        <div className="text-red-500">Error: {error}</div>
+        <div className="text-red-500">Error: {chartDatas.error}</div>
       </div>
     );
   }
@@ -362,8 +377,8 @@ export function TradingPairChart({ symbol, className }: TradingPairChartProps) {
         <div className="flex items-baseline gap-3">
           <span className="text-3xl text-gray-900">
             {quote === "USD" || quote === "USDT" || quote === "USDC"
-              ? `$${currentPrice < 0.01 ? currentPrice.toFixed(8) : currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-              : `${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 8 })} ${quote}`}
+              ? `$${chartDatas.currentPrice < 0.01 ? chartDatas.currentPrice.toFixed(8) : chartDatas.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+              : `${chartDatas.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 8 })} ${quote}`}
           </span>
           <span
             className={`text-md font-medium ${

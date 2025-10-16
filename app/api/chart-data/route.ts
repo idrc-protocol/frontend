@@ -48,6 +48,8 @@ export async function GET(request: Request) {
     const currentPrice = formattedData[formattedData.length - 1]?.close || 0;
     const firstPrice = formattedData[0]?.open || currentPrice;
     const priceChange24h = currentPrice - firstPrice;
+    const priceChangePct24h =
+      firstPrice !== 0 ? (priceChange24h / firstPrice) * 100 : 0;
 
     return NextResponse.json({
       success: true,
@@ -56,11 +58,8 @@ export async function GET(request: Request) {
         timeframe,
         chartData: formattedData,
         currentPrice,
-        priceChange24h,
-        priceChangePct24h:
-          firstPrice !== 0
-            ? ((priceChange24h / firstPrice) * 100).toFixed(2)
-            : "0",
+        priceChange24h: priceChangePct24h,
+        priceChangePct24h: priceChangePct24h.toFixed(2),
       },
     });
   } catch (error) {
@@ -127,8 +126,21 @@ export async function POST(request: Request) {
         },
       });
 
+      const uniqueDataPoints = chartDataPoints.reduce(
+        (acc: any[], point: any) => {
+          const exists = acc.find((p) => p.timestamp === point.timestamp);
+
+          if (!exists) {
+            acc.push(point);
+          }
+
+          return acc;
+        },
+        [],
+      );
+
       const createdData = await prisma.chartData.createMany({
-        data: chartDataPoints.map((point: any) => ({
+        data: uniqueDataPoints.map((point: any) => ({
           symbol,
           timeframe: tf,
           timestamp: BigInt(point.timestamp),
@@ -137,6 +149,7 @@ export async function POST(request: Request) {
           low: point.low,
           close: point.close,
         })),
+        skipDuplicates: true,
       });
 
       results.push({
