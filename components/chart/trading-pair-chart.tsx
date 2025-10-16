@@ -5,6 +5,8 @@ import type { IChartApi, ISeriesApi } from "lightweight-charts";
 import { AreaSeries } from "lightweight-charts";
 import React, { useEffect, useRef } from "react";
 
+import { AnimatedNumber } from "../animations/animated-number";
+
 const TIMEFRAMES = ["1D", "1W", "1M", "3M", "1Y", "ALL"] as const;
 
 export type Timeframe = (typeof TIMEFRAMES)[number];
@@ -56,10 +58,7 @@ export function TradingPairChart({
   };
 
   const [base, quote] = symbol.split("/");
-  const priceChangePercent =
-    chartDatas.currentPrice !== 0
-      ? (chartDatas.priceChange24h / chartDatas.currentPrice) * 100
-      : 0;
+  const priceChangePercent = chartDatas.priceChange24h;
   const isPositive = chartDatas.priceChange24h >= 0;
 
   useEffect(() => {
@@ -376,16 +375,37 @@ export function TradingPairChart({
         </div>
         <div className="flex items-baseline gap-3">
           <span className="text-3xl text-gray-900">
-            {quote === "USD" || quote === "USDT" || quote === "USDC"
-              ? `$${chartDatas.currentPrice < 0.01 ? chartDatas.currentPrice.toFixed(8) : chartDatas.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-              : `${chartDatas.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 8 })} ${quote}`}
+            {quote === "USD" || quote === "USDT" || quote === "USDC" ? (
+              <>
+                $
+                <AnimatedNumber
+                  fractionDigits={
+                    chartDatas.currentPrice < 0.00001
+                      ? 8
+                      : chartDatas.currentPrice < 0.0001
+                        ? 7
+                        : chartDatas.currentPrice < 0.001
+                          ? 6
+                          : chartDatas.currentPrice < 0.01
+                            ? 5
+                            : chartDatas.currentPrice < 0.1
+                              ? 4
+                              : 2
+                  }
+                  value={chartDatas.currentPrice}
+                />
+              </>
+            ) : (
+              `${chartDatas.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 8 })} ${quote}`
+            )}
           </span>
           <span
             className={`text-md font-medium ${
               isPositive ? "text-green-600" : "text-red-600"
             }`}
           >
-            {isPositive ? "▲" : "▼"} {Math.abs(priceChangePercent).toFixed(2)}%{" "}
+            {isPositive ? "▲" : "▼"}{" "}
+            <AnimatedNumber value={Math.abs(priceChangePercent).toFixed(2)} />%{" "}
             ({timeframe})
           </span>
         </div>
