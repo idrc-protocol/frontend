@@ -120,7 +120,7 @@ export default function Idrc() {
               alt="Chain Logo"
               className="h-7 w-auto"
               height={40}
-              src="/images/chains/base.webp"
+              src="/images/brands/base.webp"
               width={40}
             />
           </div>

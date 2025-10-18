@@ -14,6 +14,8 @@ import { usePriceFeed } from "@/hooks/query/api/use-price-feed";
 import { formatNumber } from "@/lib/helper/number";
 import { assetsInfo } from "@/data/asset-info";
 import { useSession } from "@/lib/auth-client";
+import { useChartData } from "@/hooks/use-chart-data";
+import { assetData } from "@/data/asset.data";
 
 function OverviewSkeleton() {
   return (
@@ -117,72 +119,6 @@ function OverviewSkeleton() {
       <Card className="p-5">
         <CardContent className="flex flex-col gap-5">
           <div className="flex items-center gap-1">
-            <Skeleton className="h-4 w-36" />
-            <Skeleton className="h-4 w-4 rounded-full" />
-          </div>
-
-          <table className="w-full table-fixed">
-            <colgroup>
-              <col className="w-[30%]" />
-              <col className="w-[20%]" />
-              <col className="w-[25%]" />
-              <col className="w-[25%]" />
-            </colgroup>
-
-            <thead>
-              <tr className="border-b">
-                <th className="text-left text-sm font-normal pb-2">
-                  <Skeleton className="h-4 w-16" />
-                </th>
-                <th className="text-center text-sm font-normal pb-2">
-                  <div className="flex justify-center">
-                    <Skeleton className="h-4 w-16" />
-                  </div>
-                </th>
-                <th className="text-right text-sm font-normal pb-2">
-                  <div className="flex justify-end">
-                    <Skeleton className="h-4 w-24" />
-                  </div>
-                </th>
-                <th className="text-right text-sm font-normal pb-2">
-                  <div className="flex justify-end">
-                    <Skeleton className="h-4 w-24" />
-                  </div>
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {[1, 2].map((index) => (
-                <tr key={index} className="border-b last:border-b-0">
-                  <td className="py-3">
-                    <Skeleton className="h-4 w-28" />
-                  </td>
-                  <td className="py-3 text-center">
-                    <div className="flex justify-center">
-                      <Skeleton className="h-4 w-16" />
-                    </div>
-                  </td>
-                  <td className="py-3 text-right">
-                    <div className="flex justify-end">
-                      <Skeleton className="h-4 w-20" />
-                    </div>
-                  </td>
-                  <td className="py-3 text-right">
-                    <div className="flex justify-end">
-                      <Skeleton className="h-4 w-20" />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
-
-      <Card className="p-5">
-        <CardContent className="flex flex-col gap-5">
-          <div className="flex items-center gap-1">
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-4 w-4 rounded-full" />
           </div>
@@ -270,17 +206,26 @@ export default function Overview() {
     amountFromIdr: idrxBalanceNumber,
   });
 
+  const firstAsset = assetsInfo[0];
+  const assetFromData = assetData.find((a) => a.symbol === firstAsset?.symbol);
+  const chartSymbol = assetFromData?.chart
+    ? `${assetFromData.chart.compareSymbol}/${assetFromData.chart.compareCurrency}`
+    : firstAsset?.symbol || "IDRC";
+
+  const chartDatas = useChartData(chartSymbol, "1D");
+
+  const totalAssetValueUsd = assetsInfo.reduce((total, asset) => {
+    const assetPrice =
+      chartDatas.currentPrice || parseFloat(asset.primaryMarket.price);
+
+    return total + idrcBalanceNumber * assetPrice;
+  }, 0);
+
   const isLoading = isSessionPending || isLoadingBalances;
 
   if (isLoading) {
     return <OverviewSkeleton />;
   }
-
-  const totalAssetValueUsd = assetsInfo.reduce((total, asset) => {
-    const assetPrice = parseFloat(asset.primaryMarket.price);
-
-    return total + idrcBalanceNumber * assetPrice;
-  }, 0);
 
   const idrxUsdValue = Number(convertedToUsd) || 0;
 
@@ -525,11 +470,15 @@ export default function Overview() {
                   </td>
 
                   <td className="py-3 text-sm font-medium text-center">
-                    {formatNumber(parseFloat(asset.primaryMarket.price), {
-                      decimals: 2,
-                      thousandSeparator: ",",
-                      compact: true,
-                    })}
+                    {formatNumber(
+                      chartDatas.currentPrice ||
+                        parseFloat(asset.primaryMarket.price),
+                      {
+                        decimals: 2,
+                        thousandSeparator: ",",
+                        compact: true,
+                      },
+                    )}
                   </td>
 
                   <td className="py-3 text-sm font-medium text-right">
@@ -545,7 +494,8 @@ export default function Overview() {
                         ≈ $
                         {formatNumber(
                           (Number(idrcBalanceNumber) || 0) *
-                            parseFloat(asset.primaryMarket.price),
+                            (chartDatas.currentPrice ||
+                              parseFloat(asset.primaryMarket.price)),
                           {
                             decimals: 2,
                             thousandSeparator: ",",
