@@ -460,8 +460,8 @@ export default function Asset({ symbol }: { symbol: string }) {
                     <InfoRow
                       label="24h Change"
                       value={
-                        assetInfo.primaryMarket.priceChangePct24h
-                          ? `${formatNumber(assetInfo.primaryMarket.priceChangePct24h, { decimals: 2 })}%`
+                        chartDatas.priceChange24h
+                          ? `${formatNumber(chartDatas.priceChange24h, { decimals: 2 })}%`
                           : undefined
                       }
                     />
@@ -809,14 +809,14 @@ export default function Asset({ symbol }: { symbol: string }) {
                   <span>24h Change</span>
                   <span
                     className={`font-medium ${
-                      assetInfo?.primaryMarket.priceChangePct24h &&
-                      parseFloat(assetInfo.primaryMarket.priceChangePct24h) >= 0
+                      chartDatas.priceChange24h &&
+                      parseFloat(String(chartDatas.priceChange24h)) >= 0
                         ? "text-green-600"
                         : "text-red-600"
                     }`}
                   >
-                    {assetInfo?.primaryMarket.priceChangePct24h
-                      ? `${formatNumber(assetInfo.primaryMarket.priceChangePct24h, { decimals: 2 })}%`
+                    {chartDatas.priceChange24h
+                      ? `${formatNumber(chartDatas.priceChange24h, { decimals: 2 })}%`
                       : "0.00%"}
                   </span>
                 </div>
@@ -1111,16 +1111,14 @@ export default function Asset({ symbol }: { symbol: string }) {
                           <span>24h Change</span>
                           <span
                             className={`font-medium ${
-                              assetInfo?.primaryMarket.priceChangePct24h &&
-                              parseFloat(
-                                assetInfo.primaryMarket.priceChangePct24h,
-                              ) >= 0
+                              chartDatas.priceChange24h &&
+                              parseFloat(String(chartDatas.priceChange24h)) >= 0
                                 ? "text-green-600"
                                 : "text-red-600"
                             }`}
                           >
-                            {assetInfo?.primaryMarket.priceChangePct24h
-                              ? `${formatNumber(assetInfo.primaryMarket.priceChangePct24h, { decimals: 2 })}%`
+                            {chartDatas.priceChange24h
+                              ? `${formatNumber(chartDatas.priceChange24h, { decimals: 2 })}%`
                               : "0.00%"}
                           </span>
                         </div>

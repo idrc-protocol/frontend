@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Droplet, Loader2, AlertCircle } from "lucide-react";
+import {
+  Droplet,
+  Loader2,
+  AlertCircle,
+  Wallet as WalletIcon,
+} from "lucide-react";
 import {
   useAccount,
   useWriteContract,
@@ -13,6 +18,7 @@ import {
 import { parseUnits, formatUnits } from "viem";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import { baseSepolia } from "wagmi/chains";
 
@@ -21,6 +27,8 @@ import { BASE_SEPOLIA_TOKENS } from "@/lib/tokens";
 import { idrxABI } from "@/lib/abis/idrx.abi";
 import { formatNumber } from "@/lib/helper/number";
 import { ConnectButtonCustom } from "@/components/wallet/connect-button-custom";
+import { useWallets } from "@/hooks/query/api/use-wallets";
+import { useSession } from "@/lib/auth-client";
 
 const IDRX = BASE_SEPOLIA_TOKENS.IDRX;
 const REQUIRED_CHAIN_ID = baseSepolia.id;
@@ -29,11 +37,27 @@ export default function Faucet() {
   const { address, isConnected, chainId } = useAccount();
   const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
   const { disconnect } = useDisconnect();
+  const { openConnectModal } = useConnectModal();
+  const { data: session } = useSession();
+  const { data: userWallets } = useWallets(session?.user?.id);
   const queryClient = useQueryClient();
   const [mintAmount, setMintAmount] = useState("10000000");
 
   const isCorrectChain = chainId === REQUIRED_CHAIN_ID;
   const isWrongChain = isConnected && !isCorrectChain;
+
+  const registeredWallet = React.useMemo(() => {
+    if (!userWallets) return null;
+
+    return userWallets.find((w) => w.chain.chainId === REQUIRED_CHAIN_ID);
+  }, [userWallets]);
+
+  const hasNoWallets = !userWallets || userWallets.length === 0;
+
+  const isWalletMismatch =
+    isConnected &&
+    registeredWallet &&
+    address?.toLowerCase() !== registeredWallet.address.toLowerCase();
 
   const {
     data: balance,
@@ -86,6 +110,16 @@ export default function Faucet() {
     switchChain({ chainId: REQUIRED_CHAIN_ID });
   };
 
+  const handleConnectCorrectWallet = async () => {
+    disconnect();
+
+    setTimeout(() => {
+      if (openConnectModal) {
+        openConnectModal();
+      }
+    }, 300);
+  };
+
   const handleMint = async () => {
     if (!isConnected) {
       toast.error("Please connect your wallet first");
@@ -101,6 +135,20 @@ export default function Faucet() {
 
     if (!isCorrectChain) {
       toast.error("Please switch to Base Sepolia network");
+
+      return;
+    }
+
+    if (hasNoWallets) {
+      toast.error(
+        "No registered wallets found. Please register a wallet first.",
+      );
+
+      return;
+    }
+
+    if (isWalletMismatch) {
+      toast.error("Please connect the correct wallet");
 
       return;
     }
@@ -194,6 +242,38 @@ export default function Faucet() {
                 )}
               </Button>
             </div>
+          ) : isWalletMismatch && registeredWallet ? (
+            <div className="text-center py-12">
+              <WalletIcon className="w-16 h-16 mx-auto mb-4 text-yellow-500 opacity-70" />
+              <p className="text-lg font-medium mb-2">
+                Wallet Address Mismatch
+              </p>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto mb-2">
+                Your connected wallet ({address?.slice(0, 6)}...
+                {address?.slice(-4)}) doesn&apos;t match your registered wallet
+                ({registeredWallet.address.slice(0, 6)}...
+                {registeredWallet.address.slice(-4)}) for this network.
+              </p>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto mb-6">
+                Please connect the correct wallet to continue minting IDRX.
+              </p>
+              <Button
+                className="rounded-full mt-5 h-14"
+                onClick={handleConnectCorrectWallet}
+              >
+                <WalletIcon className="w-4 h-4 mr-2" />
+                Connect Correct Wallet
+              </Button>
+            </div>
+          ) : hasNoWallets ? (
+            <div className="text-center py-12">
+              <WalletIcon className="w-16 h-16 mx-auto mb-4 text-red-500 opacity-70" />
+              <p className="text-lg font-medium mb-2">No Registered Wallets</p>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto mb-6">
+                You need to register a wallet first before you can use the
+                faucet. Please register your wallet in your account settings.
+              </p>
+            </div>
           ) : (
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
@@ -236,7 +316,13 @@ export default function Faucet() {
                   </span>
                   <Button
                     className="rounded-full text-xs py-1 h-6 px-3"
-                    disabled={!isConnected || balanceLoading || isPending}
+                    disabled={
+                      !isConnected ||
+                      balanceLoading ||
+                      isPending ||
+                      isWalletMismatch ||
+                      hasNoWallets
+                    }
                     variant="secondary"
                     onClick={() => setMintAmount("1000000000")}
                   >
@@ -249,13 +335,13 @@ export default function Faucet() {
         </div>
       </div>
 
-      {isConnected && isCorrectChain && (
+      {isConnected && isCorrectChain && !isWalletMismatch && !hasNoWallets && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {quickAmounts.map((amount) => (
             <Button
               key={amount}
               className="h-12 rounded-3xl"
-              disabled={isPending}
+              disabled={isPending || isWalletMismatch || hasNoWallets}
               variant="outline"
               onClick={() => setMintAmount(amount)}
             >
@@ -269,7 +355,7 @@ export default function Faucet() {
         </div>
       )}
 
-      {isConnected && isCorrectChain && (
+      {isConnected && isCorrectChain && !isWalletMismatch && !hasNoWallets && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Button
             className="rounded-full h-14"
@@ -280,7 +366,13 @@ export default function Faucet() {
           </Button>
           <Button
             className="w-full h-14 font-semibold rounded-3xl"
-            disabled={isPending || !mintAmount || parseFloat(mintAmount) <= 0}
+            disabled={
+              isPending ||
+              !mintAmount ||
+              parseFloat(mintAmount) <= 0 ||
+              isWalletMismatch ||
+              hasNoWallets
+            }
             size="lg"
             onClick={handleMint}
           >

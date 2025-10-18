@@ -10,7 +10,7 @@ export default function OnboardSuccess() {
   const router = useRouter();
 
   const handleExplore = () => {
-    router.push("/explore");
+    router.push("/idrc");
   };
 
   return (

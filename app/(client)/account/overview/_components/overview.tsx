@@ -309,7 +309,7 @@ export default function Overview() {
               width={1920}
             />
           </div>
-          <Link className="z-10" href={"/explore"}>
+          <Link className="z-10" href={"/idrc"}>
             <Button className="text-sm py-5 px-3 flex items-center z-10">
               Explore Now
               <ChevronRight className="h-10 w-10" />

@@ -21,6 +21,7 @@ export default function FallbackImage({
     <Image
       {...props}
       alt={alt}
+      draggable={false}
       src={imgSrc}
       onError={() => setImgSrc(fallback)}
     />

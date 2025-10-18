@@ -363,6 +363,57 @@ export function TradingPairChart({
     );
   }
 
+  if (!chartDatas.loading && chartDatas.data.length === 0) {
+    return (
+      <div className="bg-white rounded-lg w-full max-w-full overflow-hidden">
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <h2 className="text-2xl font-medium text-gray-900">
+              {base}/{quote} Price
+            </h2>
+          </div>
+          <div className="flex items-baseline gap-3">
+            <span className="text-3xl text-gray-900">
+              {quote === "USD" || quote === "USDT" || quote === "USDC"
+                ? "$0.00"
+                : `0.00 ${quote}`}
+            </span>
+            <span className="text-md font-medium text-gray-500">
+              No data ({timeframe})
+            </span>
+          </div>
+        </div>
+
+        <div className="flex gap-2 mb-4">
+          {TIMEFRAMES.map((tf) => (
+            <button
+              key={tf}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                timeframe === tf
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+              onClick={() => setTimeframe(tf)}
+            >
+              {tf}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-center h-[400px] sm:h-[450px] md:h-[500px] rounded-lg border-2 border-dashed border-gray-200">
+          <div className="text-center">
+            <div className="text-gray-600 font-medium mb-1">
+              No historical data for {timeframe} timeframe
+            </div>
+            <div className="text-gray-500 text-sm">
+              Try selecting a different timeframe or check back later.
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`bg-white rounded-lg w-full max-w-full overflow-hidden ${className || ""}`}

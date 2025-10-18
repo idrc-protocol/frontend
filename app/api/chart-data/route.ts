@@ -30,10 +30,16 @@ export async function GET(request: Request) {
 
     if (chartData.length === 0) {
       return NextResponse.json({
-        success: false,
-        error:
-          "No data available for this trading pair. Please trigger a POST request to fetch the latest data.",
-        message: "Use POST /api/chart-data to populate data",
+        success: true,
+        data: {
+          symbol,
+          timeframe,
+          chartData: [],
+          currentPrice: 0,
+          priceChange24h: 0,
+          priceChangePct24h: "0.00",
+        },
+        message: "No historical data available for this timeframe",
       });
     }
 
