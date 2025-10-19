@@ -111,7 +111,7 @@ export default function DialogSell({
   const handleConfirmSell = () => {
     if (!sellAmount || !userAddress) return;
 
-    const sharesInWei = parseUnits(sellAmount, 18);
+    const sharesInWei = parseUnits(sellAmount, 2);
 
     setShowTransactionDialog(true);
     onOpenChange(false);

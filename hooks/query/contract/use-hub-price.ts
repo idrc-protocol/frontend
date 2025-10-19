@@ -44,7 +44,7 @@ export const calculateIdrcAmount = (
 
   if (isNaN(idrcNum) || idrcNum === 0) return 0;
 
-  const pricePerIdrc = Number(normalize(Number(price), 18));
+  const pricePerIdrc = Number(normalize(Number(price), 2));
   const assetAmount = idrcNum / pricePerIdrc;
 
   return assetAmount;

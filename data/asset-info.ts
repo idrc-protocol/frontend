@@ -44,7 +44,7 @@ export const assetsInfo = [
         network: "Base Sepolia",
         chainId: 84532,
         address: contractAddresses.IDRCProxy,
-        decimals: 18,
+        decimals: 2,
       },
     ],
     integrationPartners: [],

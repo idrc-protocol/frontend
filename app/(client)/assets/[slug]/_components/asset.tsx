@@ -272,7 +272,7 @@ export default function Asset({ symbol }: { symbol: string }) {
   const handleSell = () => {
     if (!sellAmount || Number(sellAmount) <= 0) return;
 
-    const amountInWei = parseUnits(sellAmount, 18);
+    const amountInWei = parseUnits(sellAmount, 2);
 
     setShowTransactionDialog(true);
 
