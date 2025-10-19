@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
           });
 
           const idrxFormatted = formatUnits(idrxBalance as bigint, 2);
-          const idrcFormatted = formatUnits(idrcBalance as bigint, 18);
+          const idrcFormatted = formatUnits(idrcBalance as bigint, 2);
 
           return {
             walletId: wallet.id,
