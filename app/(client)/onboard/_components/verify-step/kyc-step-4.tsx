@@ -10,6 +10,8 @@ import {
   SumsubWebSDKConfig,
   SumsubWebSDKOptions,
 } from "@/types/sumsub/sumsub.type";
+import { useKycStatus } from "@/hooks/query/api/use-onboarding-status";
+import { useSession } from "@/lib/auth-client";
 
 export default function KycStep4({
   onNext,
@@ -20,6 +22,13 @@ export default function KycStep4({
   onBack?: () => void;
   onApplicantIdChange?: (applicantId: string) => void;
 }) {
+  const { data: session } = useSession();
+  const {
+    data: kycStatus,
+    isLoading: isLoadingKyc,
+    refetch: refetchKycStatus,
+  } = useKycStatus(session?.user?.id);
+
   const [accessToken, setAccessToken] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string>("");
@@ -33,6 +42,29 @@ export default function KycStep4({
       isMountedRef.current = false;
     };
   }, []);
+
+  const saveApplicantIdToDatabase = async (
+    applicantId: string,
+    kycVerified?: boolean,
+  ) => {
+    try {
+      const response = await fetch("/api/user/kyc-status", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ applicantId, kycVerified }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save applicantId");
+      }
+
+      await refetchKycStatus();
+    } catch (error) {
+      throw error;
+    }
+  };
 
   const generateToken = async () => {
     if (!isMountedRef.current) return;
@@ -69,13 +101,13 @@ export default function KycStep4({
     return accessToken;
   };
 
-  const handleRedirection = (applicantId?: string) => {
+  const handleRedirection = async (applicantId?: string) => {
     if (hasRedirected || !isMountedRef.current) return;
 
     setHasRedirected(true);
 
     if (applicantId) {
-      localStorage.setItem("sumsubApplicantId", applicantId);
+      await saveApplicantIdToDatabase(applicantId, true);
     }
 
     setTimeout(() => {
@@ -115,7 +147,7 @@ export default function KycStep4({
     }
   }, [applicantId]);
 
-  const handleMessage = (type: string, payload: any) => {
+  const handleMessage = async (type: string, payload: any) => {
     if (!isMountedRef.current || hasRedirected) return;
 
     switch (type) {
@@ -125,7 +157,7 @@ export default function KycStep4({
       case "idCheck.applicantStatus":
         if (payload.applicantId) {
           setApplicantId(payload.applicantId);
-          localStorage.setItem("sumsubApplicantId", payload.applicantId);
+          await saveApplicantIdToDatabase(payload.applicantId);
           onApplicantIdChange?.(payload.applicantId);
 
           if (isCompletedStatus(payload)) {
@@ -138,7 +170,7 @@ export default function KycStep4({
       case "idCheck.onApplicantLoaded":
         if (payload.applicantId) {
           setApplicantId(payload.applicantId);
-          localStorage.setItem("sumsubApplicantId", payload.applicantId);
+          await saveApplicantIdToDatabase(payload.applicantId);
           onApplicantIdChange?.(payload.applicantId);
 
           if (isCompletedStatus(payload)) {
@@ -152,7 +184,7 @@ export default function KycStep4({
       case "idCheck.onApplicantSubmitted":
         if (payload.applicantId) {
           setApplicantId(payload.applicantId);
-          localStorage.setItem("sumsubApplicantId", payload.applicantId);
+          await saveApplicantIdToDatabase(payload.applicantId);
           onApplicantIdChange?.(payload.applicantId);
         }
         toast.success("KYC submitted successfully. Verification in progress.");
@@ -163,7 +195,6 @@ export default function KycStep4({
       case "idCheck.onApplicantVerificationCompleted":
         if (payload.applicantId) {
           setApplicantId(payload.applicantId);
-          localStorage.setItem("sumsubApplicantId", payload.applicantId);
         }
         toast.success("Verification completed successfully!");
         handleRedirection(payload.applicantId);
@@ -175,7 +206,6 @@ export default function KycStep4({
           toast.success("Verification completed!");
           if (payload.applicantId) {
             setApplicantId(payload.applicantId);
-            localStorage.setItem("sumsubApplicantId", payload.applicantId);
           }
           handleRedirection(payload.applicantId);
         }
@@ -184,14 +214,14 @@ export default function KycStep4({
       case "idCheck.onStepChange":
         if (payload.applicantId) {
           setApplicantId(payload.applicantId);
-          localStorage.setItem("sumsubApplicantId", payload.applicantId);
+          await saveApplicantIdToDatabase(payload.applicantId);
         }
         break;
 
       case "idCheck.actionCompleted":
         if (payload.applicantId) {
           setApplicantId(payload.applicantId);
-          localStorage.setItem("sumsubApplicantId", payload.applicantId);
+          await saveApplicantIdToDatabase(payload.applicantId);
         }
 
         break;
@@ -199,7 +229,6 @@ export default function KycStep4({
       case "idCheck.videoIdentCompleted":
         if (payload.applicantId) {
           setApplicantId(payload.applicantId);
-          localStorage.setItem("sumsubApplicantId", payload.applicantId);
         }
         toast.success("Video verification completed!");
         handleRedirection(payload.applicantId);
@@ -208,7 +237,7 @@ export default function KycStep4({
       case "idCheck.onApplicantStatusChanged":
         if (payload.applicantId) {
           setApplicantId(payload.applicantId);
-          localStorage.setItem("sumsubApplicantId", payload.applicantId);
+          await saveApplicantIdToDatabase(payload.applicantId);
 
           if (isCompletedStatus(payload)) {
             toast.success("Verification completed!");
@@ -251,12 +280,16 @@ export default function KycStep4({
   };
 
   useEffect(() => {
-    if (!accessToken && !localStorage.getItem("sumsubApplicantId")) {
+    if (kycStatus?.applicantId) {
+      setApplicantId(kycStatus.applicantId);
+      if (kycStatus.kycVerified) {
+        toast.success("Verification already completed!");
+        handleRedirection(kycStatus.applicantId);
+      }
+    } else if (!accessToken && !isLoadingKyc) {
       generateToken();
-    } else if (localStorage.getItem("sumsubApplicantId")) {
-      setApplicantId(localStorage.getItem("sumsubApplicantId") || "");
     }
-  }, []);
+  }, [kycStatus, isLoadingKyc, accessToken]);
 
   useEffect(() => {
     setHasRedirected(false);
@@ -281,7 +314,7 @@ export default function KycStep4({
     );
   }
 
-  if (loading || !isMountedRef.current) {
+  if (loading || isLoadingKyc || !isMountedRef.current) {
     return (
       <div className="flex flex-col gap-5 w-full max-w-md justify-center items-center">
         <Loader2 className="animate-spin mx-auto" size={24} />
@@ -361,9 +394,9 @@ export default function KycStep4({
             expirationHandler={handleTokenExpiration}
             options={options}
             onError={handleError}
-            onMessage={(type: string, payload: any) =>
-              handleMessage(type, payload)
-            }
+            onMessage={(type: string, payload: any) => {
+              handleMessage(type, payload);
+            }}
           />
         )}
 

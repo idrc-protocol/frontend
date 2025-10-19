@@ -4,6 +4,7 @@ import { useSession } from "@/lib/auth-client";
 
 interface KycStatusResponse {
   kycVerified: boolean;
+  applicantId?: string;
   user?: {
     emailVerified: boolean;
   };
