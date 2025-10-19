@@ -8,6 +8,7 @@ import {
   RotateCcw,
   AlertTriangle,
 } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -37,6 +38,8 @@ interface MultiStepTransactionDialogProps {
   onClose?: () => void;
   explorerUrl?: string;
   showTxHashes?: boolean;
+  redirectUrl?: string;
+  redirectLabel?: string;
 }
 
 const getStatusIcon = (status: Status) => {
@@ -124,6 +127,8 @@ export function MultiStepTransactionDialog({
   onClose,
   explorerUrl = "https://etherscan.io/tx",
   showTxHashes = true,
+  redirectUrl,
+  redirectLabel,
 }: MultiStepTransactionDialogProps) {
   const hasErrors = steps.some((step) => step.status === "error");
 
@@ -293,14 +298,28 @@ export function MultiStepTransactionDialog({
             </Button>
           )}
 
-          <Button
-            className="w-full sm:w-auto rounded-3xl"
-            disabled={!canClose}
-            variant={isSuccess ? "default" : "outline"}
-            onClick={handleClose}
-          >
-            {isLoading ? "Processing..." : isSuccess ? "Done" : "Close"}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              className="w-full sm:w-auto rounded-3xl"
+              disabled={!canClose}
+              variant={isSuccess ? "default" : "outline"}
+              onClick={handleClose}
+            >
+              {isLoading ? "Processing..." : isSuccess ? "Done" : "Close"}
+            </Button>
+            {redirectUrl && isSuccess && (
+              <Link href={redirectUrl}>
+                <Button
+                  className="w-full sm:w-auto rounded-3xl"
+                  disabled={!canClose}
+                  variant={isSuccess ? "default" : "outline"}
+                  onClick={handleClose}
+                >
+                  {redirectLabel || "Continue"}
+                </Button>
+              </Link>
+            )}
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

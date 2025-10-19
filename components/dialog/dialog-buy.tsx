@@ -11,10 +11,7 @@ import { useSubscription } from "@/hooks/mutation/contract/use-subscription";
 import { MultiStepTransactionDialog } from "@/components/dialog/multi-step-transaction-dialog";
 import { contractAddresses } from "@/lib/constants";
 import { BASE_SEPOLIA_TOKENS } from "@/lib/tokens";
-import {
-  useHubPrice,
-  calculateIdrxAmount,
-} from "@/hooks/query/contract/use-hub-price";
+import { calculateIdrxAmount } from "@/hooks/query/contract/use-hub-price";
 import { useWallets } from "@/hooks/query/api/use-wallets";
 import { useSession } from "@/lib/auth-client";
 import { AssetInfo } from "@/data/asset-info";
@@ -82,12 +79,7 @@ export default function DialogBuy({
     registeredWallet &&
     userAddress?.toLowerCase() !== registeredWallet.address.toLowerCase();
 
-  const {
-    price: hubPrice,
-    isLoading: isLoadingHubPrice,
-    isError: isErrorHubPrice,
-  } = useHubPrice();
-  const idrxAmountNeeded = calculateIdrxAmount(buyAmount, hubPrice);
+  const idrxAmountNeeded = calculateIdrxAmount(buyAmount, BigInt(100));
 
   const { balanceNormalized: userBalance } = useBalanceCustom({
     tokenIDRX: true,
@@ -260,15 +252,6 @@ export default function DialogBuy({
                       <p className="text-sm font-medium text-yellow-900">
                         Unable to calculate required IDRX amount
                       </p>
-                      <p className="text-sm text-yellow-800 mt-1">
-                        {isLoadingHubPrice
-                          ? "Loading price data from blockchain..."
-                          : isErrorHubPrice
-                            ? "Error fetching price from contract. Please ensure you're connected to the correct network."
-                            : !hubPrice
-                              ? "Hub price is not available. Please try connecting your wallet or refreshing the page."
-                              : "Please check if the asset price is available or try again later."}
-                      </p>
                     </div>
                   ) : Number(userBalance) < Number(idrxAmountNeeded) &&
                     selectedTokenSymbol &&
@@ -410,6 +393,8 @@ export default function DialogBuy({
         isLoading={subscription.isLoading}
         isSuccess={subscription.isSuccess}
         open={showTransactionDialog}
+        redirectLabel="Check Portfolio"
+        redirectUrl="/account"
         showTxHashes={true}
         steps={subscription.steps}
         title="Purchase Transaction"
