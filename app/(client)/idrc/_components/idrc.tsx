@@ -32,8 +32,8 @@ export default function Idrc() {
         </div>
 
         <div className="flex flex-col">
-          <span className="text-[60px]">The Global Standard</span>
-          <div className="text-[60px] leading-10 flex items-center gap-2">
+          <span className="text-3xl sm:text-[60px]">The Global Standard</span>
+          <div className="text-3xl sm:text-[60px] leading-10 flex items-center gap-2">
             <span>for </span>
             <RotatingText
               animate={{ y: 0 }}
@@ -88,7 +88,7 @@ export default function Idrc() {
         <div className="flex items-center gap-5">
           <div>
             <span className="text-sm">Price</span>
-            <h2 className="text-4xl font-medium">
+            <h2 className="text-3xl sm:text-4xl font-medium">
               {formatNumber(data?.idrToUsd || 0, {
                 decimals: 5,
                 prefix: "$",
@@ -97,13 +97,13 @@ export default function Idrc() {
           </div>
           <div>
             <span className="text-sm">APY</span>
-            <h2 className="text-4xl font-medium">
+            <h2 className="text-3xl sm:text-4xl font-medium">
               {formatNumber(4.56, { decimals: 2, suffix: "%" })}
             </h2>
           </div>
           <div>
             <span className="text-sm">TVL</span>
-            <h2 className="text-4xl font-medium">
+            <h2 className="text-3xl sm:text-4xl font-medium">
               {formatNumber(67000000, {
                 decimals: 0,
                 prefix: "$",
