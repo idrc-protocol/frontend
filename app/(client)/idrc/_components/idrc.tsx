@@ -32,8 +32,10 @@ export default function Idrc() {
         </div>
 
         <div className="flex flex-col">
-          <span className="text-3xl sm:text-[60px]">The Global Standard</span>
-          <div className="text-3xl sm:text-[60px] leading-10 flex items-center gap-2">
+          <span className="text-3xl sm:text-5xl md:text-[60px]">
+            The Global Standard
+          </span>
+          <div className="text-3xl sm:text-5xl md:text-[60px] leading-10 flex items-center gap-2">
             <span>for </span>
             <RotatingText
               animate={{ y: 0 }}
@@ -45,12 +47,10 @@ export default function Idrc() {
               staggerDuration={0.05}
               staggerFrom="last"
               texts={[
-                "Payment",
                 "DeFi",
                 "Remittance",
                 "Stable Asset",
                 "Collateral",
-                "Loyalty",
                 "Yield",
               ]}
               transition={{
@@ -127,7 +127,7 @@ export default function Idrc() {
         </div>
       </div>
 
-      <div className="absolute top-1/2  -translate-y-1/2 right-0 w-[60vw] z-0">
+      <div className="absolute top-0 md:top-1/2 md:-translate-y-1/2 right-0 w-full md:w-[60vw] z-0">
         <WorldMap
           dots={[
             {
