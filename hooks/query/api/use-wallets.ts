@@ -17,7 +17,8 @@ export const useWallets = (userId?: string) => {
       return data.wallets || [];
     },
     enabled: !!userId,
-    staleTime: 60000,
+    staleTime: 1000 * 60 * 5,
+    refetchInterval: 1000 * 60 * 10,
   });
 };
 

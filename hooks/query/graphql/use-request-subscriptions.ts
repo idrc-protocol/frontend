@@ -23,7 +23,7 @@ export const useRequestSubscriptions = ({
       );
     },
     staleTime: 60 * 5,
-    refetchInterval: 60 * 1,
+    refetchInterval: 60 * 10,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
