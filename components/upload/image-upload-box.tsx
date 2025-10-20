@@ -37,12 +37,23 @@ const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ onChange, value }) => {
   return (
     <CldUploadWidget
       options={{
-        showAdvancedOptions: false,
-        showSkipCropButton: false,
+        showAdvancedOptions: true,
+        showSkipCropButton: true,
         showUploadMoreButton: false,
         sources: ["local", "url", "camera"],
         multiple: false,
         maxFiles: 1,
+        cropping: true,
+        croppingCoordinatesMode: "custom",
+        croppingShowBackButton: true,
+        croppingValidateDimensions: true,
+        minImageWidth: 100,
+        minImageHeight: 100,
+        maxImageWidth: 2000,
+        maxImageHeight: 2000,
+        croppingShowDimensions: true,
+        resourceType: "image",
+        clientAllowedFormats: ["png", "jpg", "jpeg", "gif", "webp"],
       }}
       uploadPreset="z6euuqyl"
       onClose={() => {

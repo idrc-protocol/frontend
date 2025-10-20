@@ -115,7 +115,11 @@ export default function Navbar() {
                 <AvatarFallback className="bg-black text-white text-sm font-normal">
                   {getUserInitials(user)}
                 </AvatarFallback>
-                <AvatarImage alt="User Avatar" src={user?.image!} />
+                <AvatarImage
+                  alt="User Avatar"
+                  className="object-cover"
+                  src={user?.image!}
+                />
               </Avatar>
             </Link>
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
