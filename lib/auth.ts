@@ -65,7 +65,7 @@ export const auth = betterAuth({
   advanced: {
     cookiePrefix: "better-auth",
     crossSubDomainCookies: {
-      enabled: false,
+      enabled: true,
     },
     useSecureCookies: process.env.NODE_ENV === "production",
     generateId: () => crypto.randomUUID(),
