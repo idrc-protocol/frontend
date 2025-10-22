@@ -133,7 +133,7 @@ const nextConfig: NextConfig = {
                   "font-src 'self' https://fonts.gstatic.com",
                   "img-src 'self' data: https: blob:",
                   "connect-src 'self' https://farcaster.xyz https://client.farcaster.xyz https://warpcast.com https://client.warpcast.com https://wrpcd.net https://*.wrpcd.net https://privy.farcaster.xyz https://privy.warpcast.com https://auth.privy.io https://*.rpc.privy.systems https://cloudflareinsights.com https://explorer-api.walletconnect.com https://*.walletconnect.org https://*.walletconnect.com https://*.reown.com https://pulse.walletconnect.org https://explorer-api.walletconnect.com https: wss:",
-                  "frame-src 'self' https://accounts.google.com *.sumsub.com",
+                  "frame-src 'self' https://accounts.google.com *.sumsub.com https://challenges.cloudflare.com",
                   "form-action 'self'",
                   "base-uri 'self'",
                   "object-src 'none'",
