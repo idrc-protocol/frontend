@@ -15,9 +15,11 @@ export async function GET() {
 
   return Response.json({
     accountAssociation: {
-      header: "",
-      payload: "",
-      signature: "",
+      header:
+        "eyJmaWQiOjEwNTA0NjMsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHhBMDhDMjNDOEQzN0FkNjNFQzNDNWFDNGI5NDlmMENGMDVENzdkQ2ExIn0",
+      payload: "eyJkb21haW4iOiJhcHAuaWRyYy5zaXRlIn0",
+      signature:
+        "sM09Mg7ET5frsrIZ5mLQomb54CdH17HURp46qxZvnYt3iRnvWv+g9Tgm2aA5/C/L0NLJ66j7jR3RwihWoMC5Zxs=",
     },
 
     miniapp: {
@@ -43,7 +45,7 @@ export async function GET() {
       tags: ["rwa", "defi", "idrc", "web3", "tokenization"],
       heroImageUrl: `${URL}/logo-white.png`,
 
-      tagline: "Bridging real-world assets on-chain",
+      tagline: "Tokenize Real Assets",
       ogTitle: "IDRC — Tokenized RWA Protocol",
       ogDescription:
         "Empowering real-world asset tokenization with DeFi transparency.",
