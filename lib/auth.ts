@@ -67,7 +67,14 @@ export const auth = betterAuth({
     crossSubDomainCookies: {
       enabled: false,
     },
+    useSecureCookies: process.env.NODE_ENV === "production",
+    generateId: () => crypto.randomUUID(),
   },
+  trustedOrigins: [
+    "https://app.idrc.site",
+    "https://frames.warpcast.com",
+    "https://client.warpcast.com",
+  ],
 });
 
 export type Session = typeof auth.$Infer.Session.session;
