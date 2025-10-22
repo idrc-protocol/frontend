@@ -65,7 +65,8 @@ export const auth = betterAuth({
   advanced: {
     disableCSRFCheck: true,
     defaultCookieAttributes: {
-      domain: "app.idrc.site; farcaster.xyz; warpcast.com",
+      domain:
+        "app.idrc.site; farcaster.xyz; warpcast.com; frames.warpcast.com; client.warpcast.com",
     },
     cookiePrefix: "better-auth",
     crossSubDomainCookies: {
@@ -79,6 +80,7 @@ export const auth = betterAuth({
     "https://frames.warpcast.com",
     "https://client.warpcast.com",
     "https://farcaster.xyz",
+    "https://warpcast.com",
   ],
 });
 
