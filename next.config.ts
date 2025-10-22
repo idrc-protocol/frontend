@@ -128,7 +128,7 @@ const nextConfig: NextConfig = {
               ? ""
               : [
                   "default-src 'self'",
-                  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com",
+                  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com https://upload-widget.cloudinary.com https://challenges.cloudflare.com",
                   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
                   "font-src 'self' https://fonts.gstatic.com",
                   "img-src 'self' data: https: blob:",
