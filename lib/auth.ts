@@ -65,7 +65,7 @@ export const auth = betterAuth({
   advanced: {
     disableCSRFCheck: true,
     defaultCookieAttributes: {
-      domain: "app.idrc.site; farcaster.xyz",
+      domain: "app.idrc.site; farcaster.xyz; warpcast.com",
     },
     cookiePrefix: "better-auth",
     crossSubDomainCookies: {
