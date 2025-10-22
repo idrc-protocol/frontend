@@ -13,7 +13,7 @@ export default function Idrc() {
   const { data } = usePriceFeed();
 
   return (
-    <div className="w-screen min-h-svh pt-20 relative px-10 bg-[#e8f0ff]">
+    <div className="w-screen min-h-svh pt-10 md:pt-20 relative px-10 bg-[#e8f0ff]">
       <div className="absolute top-0 left-0 w-full h-[35vh] bg-gradient-to-b from-white/60 via-transparent to-transparent z-20 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-full h-[35vh] bg-gradient-to-t from-white/60 via-transparent to-transparent z-20 pointer-events-none" />
       <div className="flex flex-col gap-5 h-full z-10 relative max-w-xl pt-20">
