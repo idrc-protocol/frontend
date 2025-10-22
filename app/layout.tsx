@@ -9,6 +9,7 @@ import React from "react";
 import DefaultLayout from "@/components/layout/default";
 import Providers from "@/components/providers";
 import { siteConfig } from "@/config/site";
+import { FarcasterInit } from "@/components/farcaster-init";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -70,11 +71,39 @@ export default async function RootLayout({
 
   return (
     <html suppressHydrationWarning lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  if (typeof window !== 'undefined') {
+                    const checkSDK = setInterval(() => {
+                      if (window.sdk && window.sdk.actions && window.sdk.actions.ready) {
+                        clearInterval(checkSDK);
+                        window.sdk.actions.ready().then(() => {
+                          console.log('✅ Farcaster SDK ready() called successfully!');
+                        }).catch((err) => {
+                          console.error('❌ Farcaster SDK ready() failed:', err);
+                        });
+                      }
+                    }, 100);
+                    setTimeout(() => clearInterval(checkSDK), 5000);
+                  }
+                } catch (e) {
+                  console.error('Error initializing Farcaster SDK:', e);
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className={`antialiased bg-background text-foreground`}>
         <Script
           src="https://upload-widget.cloudinary.com/global/all.js"
           strategy="lazyOnload"
         />
+        <FarcasterInit />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Providers>
             <DefaultLayout>{children}</DefaultLayout>
