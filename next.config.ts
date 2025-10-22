@@ -108,7 +108,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Permissions-Policy",
-            value: "identity-credentials-get=*",
+            value: "identity-credentials-get=*, autoplay=*, fullscreen=*, cross-origin-isolated=*",
           },
           {
             key: "X-Content-Type-Options",
