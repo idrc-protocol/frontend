@@ -34,6 +34,19 @@ export const metadata: Metadata = {
     shortcut: "/favicon-16x16.png",
     apple: "/apple-touch-icon.png",
   },
+  other: {
+    "fc:frame": JSON.stringify({
+      version: siteConfig.miniapp.version,
+      imageUrl: siteConfig.miniapp.heroImageUrl,
+      button: {
+        title: `${siteConfig.miniapp.name} Protocol`,
+        action: {
+          name: `Launch ${siteConfig.miniapp.name}`,
+          type: "launch_frame",
+        },
+      },
+    }),
+  },
 };
 
 export const viewport: Viewport = {

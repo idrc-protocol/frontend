@@ -11,6 +11,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@farcaster/miniapp-sdk": "^0.2.1",
     "@hookform/resolvers": "^5.2.1",
     "@libsql/kysely-libsql": "^0.4.1",
     "@node-rs/argon2": "^2.0.2",
