@@ -16,6 +16,7 @@ model User {
   image           String?
   username        String?   @unique
   displayUsername String?
+  role            String    @default("user")
   kycVerified     Boolean   @default(false)
   applicantId     String?
   createdAt       DateTime  @default(now())

@@ -190,13 +190,13 @@ export default function EditWalletSheet({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{trigger}</SheetTrigger>
-      <SheetContent className="top-5 right-5 h-[95vh] rounded-4xl min-w-xl p-5">
+      <SheetContent className="top-0 right-0 h-full md:top-5 md:right-5 md:h-[95vh] md:rounded-4xl w-full sm:max-w-xl p-4 md:p-5">
         <form onSubmit={handleSubmit}>
           <SheetHeader>
-            <SheetTitle className="text-2xl font-medium text-black">
+            <SheetTitle className="text-xl md:text-2xl font-medium text-black">
               {wallet ? "Update Wallet" : "Add New Wallet"}
             </SheetTitle>
-            <SheetDescription>
+            <SheetDescription className="text-sm">
               {wallet
                 ? "Update your wallet information"
                 : "Add a new wallet to your account for investing"}
@@ -233,10 +233,10 @@ export default function EditWalletSheet({
             />
           </div>
 
-          <SheetFooter className="flex flex-row items-center justify-between">
+          <SheetFooter className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
             <SheetClose asChild>
               <Button
-                className="text-lg p-6"
+                className="text-base md:text-lg p-4 md:p-6"
                 disabled={isSaving}
                 type="button"
                 variant="outline"
@@ -245,7 +245,7 @@ export default function EditWalletSheet({
               </Button>
             </SheetClose>
             <Button
-              className="text-lg p-6"
+              className="text-base md:text-lg p-4 md:p-6"
               disabled={isSaving || !formData.address || !formData.chainId}
               type="submit"
             >

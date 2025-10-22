@@ -1,9 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import BigNumber from "bignumber.js";
 
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 BigNumber.config({ DECIMAL_PLACES: 50, ROUNDING_MODE: BigNumber.ROUND_DOWN });
+const URL_APP = process.env.NEXT_PUBLIC_APP_URL;
 
 export async function GET(request: Request) {
   try {
@@ -60,15 +62,41 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    const session = await auth.api.getSession({ headers: request.headers });
+
+    if (!session || !session.user) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Unauthorized",
+        },
+        { status: 401 },
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { role: true },
+    });
+
+    if (!user || user.role !== "admin") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Forbidden: Admin access required",
+        },
+        { status: 403 },
+      );
+    }
+
     const body = await request.json().catch(() => ({}));
     const base = body.base || "USD";
     const target = body.target || "IDR";
     const symbol = body.symbol || "IDRX/USD";
 
-    const url = new URL(request.url);
-    const chartDataUrl = `${url.origin}/api/chart-data?symbol=${encodeURIComponent(symbol)}&timeframe=1D`;
+    const chartDataUrl = `${URL_APP}/api/chart-data?symbol=${encodeURIComponent(symbol)}&timeframe=1D`;
 
     const chartResponse = await fetch(chartDataUrl);
 
