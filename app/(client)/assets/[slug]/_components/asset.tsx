@@ -654,7 +654,7 @@ export default function Asset({ symbol }: { symbol: string }) {
                       ~{" "}
                       {formatNumber(Number(0.1), {
                         compact: true,
-                        decimals: 0,
+                        decimals: 1,
                         prefix: "$",
                       })}
                     </span>
@@ -975,7 +975,7 @@ export default function Asset({ symbol }: { symbol: string }) {
                               ~{" "}
                               {formatNumber(Number(0.1), {
                                 compact: true,
-                                decimals: 0,
+                                decimals: 1,
                                 prefix: "$",
                               })}
                             </span>
