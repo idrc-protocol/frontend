@@ -22,8 +22,8 @@ export const useRequestSubscriptions = ({
         queryRequestedSubscriptions(userAddress!.toString().toLowerCase()),
       );
     },
-    staleTime: 60 * 5,
-    refetchInterval: 60 * 10,
+    staleTime: 1000 * 60 * 5,
+    refetchInterval: 1000 * 60 * 10,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
