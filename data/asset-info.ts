@@ -86,7 +86,7 @@ export const assetsInfo = [
       payoutFrequency: "none",
       ticker: "IDRC",
     },
-    createdAt: "2025-07-17T21:34:03.081Z",
+    createdAt: "2025-10-20T21:34:03.081Z",
     iconSrc: "/idrc-token.png",
   },
 ];

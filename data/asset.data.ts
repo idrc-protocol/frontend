@@ -37,7 +37,7 @@ export const assetData = [
         tagLabel: "Indonesia",
       },
     ],
-    createdAt: 1752788043081,
+    createdAt: 1760918400000,
     primaryMarket: {
       symbol: "IDRC",
       price: "1",
@@ -51,7 +51,7 @@ export const assetData = [
       compareSymbol: "IDRX",
       compareCurrency: "USD",
     },
-    timestamp: 1757479255771,
+    timestamp: 1760918400000,
   },
 ];
 
@@ -93,7 +93,7 @@ export const defaultAssetData = {
       tagLabel: "Indonesia",
     },
   ],
-  createdAt: 1752788043081,
+  createdAt: 1760918400000,
   primaryMarket: {
     symbol: "IDRC",
     price: "1",
@@ -107,5 +107,5 @@ export const defaultAssetData = {
     compareSymbol: "IDRX",
     compareCurrency: "USD",
   },
-  timestamp: 1757479255771,
+  timestamp: 1760918400000,
 };
