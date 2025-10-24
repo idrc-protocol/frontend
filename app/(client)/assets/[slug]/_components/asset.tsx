@@ -652,7 +652,7 @@ export default function Asset({ symbol }: { symbol: string }) {
                     <Fuel className="text-neutral-700" size={15} />
                     <span>
                       ~{" "}
-                      {formatNumber(Number(1), {
+                      {formatNumber(Number(0.1), {
                         compact: true,
                         decimals: 0,
                         prefix: "$",
@@ -973,7 +973,7 @@ export default function Asset({ symbol }: { symbol: string }) {
                             <Fuel className="text-neutral-700" size={15} />
                             <span>
                               ~{" "}
-                              {formatNumber(Number(1), {
+                              {formatNumber(Number(0.1), {
                                 compact: true,
                                 decimals: 0,
                                 prefix: "$",
