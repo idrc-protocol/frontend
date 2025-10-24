@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password } = body;
+    const { email, password, bypassCaptcha } = body;
 
     if (!email || !password) {
       return NextResponse.json(
@@ -34,7 +34,11 @@ export async function POST(request: NextRequest) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          email,
+          password,
+          ...(bypassCaptcha && { disableCaptcha: true }),
+        }),
       },
     );
 
