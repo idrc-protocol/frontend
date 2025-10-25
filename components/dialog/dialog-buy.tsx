@@ -142,8 +142,7 @@ export default function DialogBuy({
               </DialogTitle>
               <DialogDescription>
                 <span className="font-medium text-sm">
-                  1 {assetInfo?.symbol} ≈ {assetInfo?.primaryMarket.price} USD ≈
-                  1 IDRX
+                  1 {assetInfo?.symbol} ≈ 1 IDRX
                 </span>
               </DialogDescription>
             </DialogHeader>
